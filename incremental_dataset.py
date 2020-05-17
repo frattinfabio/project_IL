@@ -33,7 +33,6 @@ def split_labels(dataset, num_groups):
 class IncrementalCIFAR():
 
   def __init__(self, root, num_groups = 10, train=True, transform=None, target_transform=None, download=False):
-        
         self.dataset = CIFAR100(root, train=train, transform=transform, target_transform=target_transform, download=download)
         self.num_groups = num_groups
         self.labels_split, self.indexes_split = split_labels(self.dataset, num_groups)
