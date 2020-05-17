@@ -28,8 +28,8 @@ def split_labels(dataset, num_groups):
 
 
 
-# IncrementalCIFAR class store the known CIFAR100 dataset and some info helpful for the 
-# incremental learning process: the  groups and their splitting
+# IncrementalCIFAR class stores the CIFAR100 dataset and some info helpful for the 
+# incremental learning process: the splitting of the groups and of the indexes
 class IncrementalCIFAR():
 
   def __init__(self, root, num_groups = 10, train=True, transform=None, target_transform=None, download=False):
