@@ -1,43 +1,51 @@
 from torchvision.datasets import CIFAR100
-from torch.utils.data import Subset
+from torchvision.datasets import VisionDataset
 import random 
-
-# splitting the 100 classes in [num_groups] groups
-# and the indexes of the images belonging to those classes as well
-def split_labels(dataset, num_groups):
-
-  labels = list(range(100))
-  labels_per_group = 100 // num_groups
-  labels_split = []
-  indexes_split = [[] for _ in range(num_groups)]
-
-  for _ in range(num_groups):
-    random.seed(42)
-    subset = random.sample(labels, labels_per_group)
-    labels_split.append(subset)
-    labels = list(set(labels) - set(subset))
-
-  for idx in range(len(dataset)):
-    label = dataset.__getitem__(idx)[1]
-    for i in range(num_groups):
-      if label in labels_split[i]:
-        indexes_split[i].append(idx)
-        break
-      
-  return labels_split, indexes_split
+import pandas as pd
+from PIL import Image
 
 
 
-# IncrementalCIFAR class stores the CIFAR100 dataset and some info helpful for the 
-# incremental learning process: the splitting of the groups and of the indexes
-class IncrementalCIFAR():
+# SubCIFAR for incremental learning
+# stores only the last 10 classes of the [classes] parameter if training data
+# stores all the classes of the [classes] parameter if test data
+class SubCIFAR(VisionDataset):
 
-  def __init__(self, root, num_groups = 10, train=True, transform=None, target_transform=None, download=False):
-        self.dataset = CIFAR100(root, train=train, transform=transform, target_transform=target_transform, download=download)
-        self.num_groups = num_groups
-        self.labels_split, self.indexes_split = split_labels(self.dataset, num_groups)
+  def __init__(self, root, classes = list(range(10)), train=True, transform=None, target_transform=None):
+    super(SubCIFAR, self).__init__(root, transform=transform, target_transform=target_transform)
 
-  # get the subset of the dataset relative to the [group_index] group
-  def get_group(self, group_index):
-    indexes = self.indexes_split[group_index]
-    return Subset(self.dataset, indexes)
+    self.train = train
+    self.classes = classes
+    if train:
+      classes_to_store = classes[-10:]
+    else:
+      classes_to_store = classes 
+
+    cifar_full = CIFAR100(root, train = train, download = False)
+    data = cifar_full.data
+    targets = cifar_full.targets
+
+    images = []
+    labels = []
+    for i in range(len(data)):
+      if targets[i] in classes_to_store:
+        images.append(data[i])
+        labels.append(targets[i])
+    self.dataFrame = pd.DataFrame(zip(images, labels), columns=["image", "label"])    
+
+# return the image and the mapped index according to its position in the [classes] list 
+# necessary for the training phase where only labels in the [0, num_of_labels-1] labels are accepted
+  def __getitem__(self, index):
+    image = self.dataFrame["image"].iloc[index]
+    label = self.dataFrame["label"].iloc[index]
+
+    image = Image.fromarray(image)
+    if self.transform is not None:
+      image = self.transform(image)
+    if self.target_transform is not None:
+      label = self.target_transform(label)
+
+    return image, self.classes.index(label)
+
+  def __len__(self):
+    return len(self.dataFrame)
