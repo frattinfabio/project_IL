@@ -1,5 +1,5 @@
 import random 
-
+import torch
 # LabelsSplitter class
 # define the labels splitting, given the total number of labels and the number of groups
 # WARNING: it is needed that num_labels % num_groups == 0
