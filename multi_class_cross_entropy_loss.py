@@ -9,7 +9,7 @@ class MultiClassCrossEntropyLoss(nn.Module):
     self.reduction = reduction
     self.T = T
         
-  def forward(self, input, target):
+  def forward(self, output, target):
     output = output.narrow(1, 0, target.shape[1])
     output = torch.log_softmax(output/self.T, dim=1)
     target = torch.softmax(target/self.T, dim=1)
