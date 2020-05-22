@@ -25,7 +25,7 @@ class MultiClassCrossEntropyLoss(nn.Module):
 
     return loss
 
-def forward(self, input, target):
+  def forward(self, input, target):
     return MultiClassCrossEntropy(input, targets, self.T)
   
     
