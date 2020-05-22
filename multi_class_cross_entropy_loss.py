@@ -9,13 +9,11 @@ class MultiClassCrossEntropyLoss(nn.Module):
     self.reduction = reduction
     self.T = T
         
-  def MultiClassCrossEntropy(output, target, T):
+  def forward(self, input, target):
     output = output.narrow(1, 0, target.shape[1])
-    
-    output = torch.log_softmax(output, dim=1)
-    target = torch.softmax(target * self.alpha, dim=1)
+    output = torch.log_softmax(output/self.T, dim=1)
+    target = torch.softmax(target/self.T, dim=1)
     loss = (output * target).mean(dim=1)
-
     if self.reduction == 'mean':
         loss = -torch.mean(loss)
     elif self.reduction == 'sum':
@@ -24,8 +22,5 @@ class MultiClassCrossEntropyLoss(nn.Module):
         loss = -loss
 
     return loss
-
-  def forward(self, input, target):
-    return MultiClassCrossEntropy(input, targets, self.T)
   
     
