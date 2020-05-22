@@ -1,4 +1,5 @@
 import torch.nn as nn
+import torch
 
 # function MultiClassCrossEntropy taken from the GitHub repo https://github.com/ngailapdi/LWF
 
