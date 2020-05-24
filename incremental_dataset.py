@@ -35,7 +35,12 @@ class SubCIFAR(VisionDataset):
       if targets[i] in self.stored_labels:
         images.append(data[i])
         labels.append(targets[i])
-    self.dataFrame = pd.DataFrame(zip(images, labels), columns=["image", "label"])    
+    self.dataFrame = pd.DataFrame(zip(images, labels), columns=["image", "label"]) 
+
+  def add_samples(new_samples):
+    new_dataframe = pd.DataFrame(new_samples, columns=["image", "label"])
+    self.dataframe = pd.concat([self.dataframe, new_dataframe], ignore_index = True)
+
 
 # return the image and the mapped index according to its position in the [all_labels] list 
 # necessary for the training phase where only labels in the [0, num_of_labels-1] labels are accepted
