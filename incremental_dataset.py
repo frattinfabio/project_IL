@@ -37,7 +37,7 @@ class SubCIFAR(VisionDataset):
         labels.append(targets[i])
     self.dataFrame = pd.DataFrame(zip(images, labels), columns=["image", "label"]) 
 
-  def add_samples(new_samples):
+  def add_samples(self, new_samples):
     new_dataframe = pd.DataFrame(new_samples, columns=["image", "label"])
     self.dataFrame = pd.concat([self.dataFrame, new_dataframe], ignore_index = True)
 
