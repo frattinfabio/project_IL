@@ -39,7 +39,7 @@ class SubCIFAR(VisionDataset):
 
   def add_samples(new_samples):
     new_dataframe = pd.DataFrame(new_samples, columns=["image", "label"])
-    self.dataframe = pd.concat([self.dataframe, new_dataframe], ignore_index = True)
+    self.dataFrame = pd.concat([self.dataFrame, new_dataframe], ignore_index = True)
 
 
 # return the image and the mapped index according to its position in the [all_labels] list 
