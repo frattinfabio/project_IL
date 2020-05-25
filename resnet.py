@@ -117,7 +117,7 @@ class ResNet(nn.Module):
         return out
 
     def forward(self, x):
-        out = self.linear(self.feature_extraction(x))
+        out = self.linear(self.features_extraction(x))
         return out
     
 def resnet20():
