@@ -2,18 +2,25 @@ import numpy as np
 import torch
 from torchvision import transforms
 
+transform = transforms.Compose([
+                                transforms.ToTensor(),
+                                transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+                                ])
+
 class NearestMeanOfExamplarsClassifier():
-  def __init__(self, feature_extractor, feat_dim, examplars):
-    self.feature_extractor = feature_extractor
+  def __init__(self, net, examplars):
+    self.net = net
+    self.net.train(False)
+
     self.means = []
 
     for i in range(len(examplars)):
       examplar_set = examplars[i][:,0]
-      features_mean = torch.zeros((feat_dim,))
+      features_mean = torch.zeros((net.linear.in_features,))
       
       for j in range(len(examplar_set)):
-        tensor = transforms.ToTensor()(examplar_set[j]).unsqueeze(0).cuda()
-        features = self.feature_extractor(tensor).squeeze(0).cpu()
+        tensor = transform(examplar_set[j]).unsqueeze(0).cuda()
+        features = self.net.features_extraction(tensor).squeeze(0).cpu()
         features = features / torch.norm(features, p = 2)
         features_mean += features
       features_mean /= len(examplar_set)
@@ -24,7 +31,8 @@ class NearestMeanOfExamplarsClassifier():
       
         
   def classify(self, input_images):
-    features = self.feature_extractor(input_images.cuda())
+    self.net.train(False)
+    features = self.net.features_extraction(input_images)
     features = features / torch.norm(features, p = 2)
     preds = []
     for feature in features:
