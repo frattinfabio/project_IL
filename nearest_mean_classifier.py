@@ -6,8 +6,9 @@ class NearestMeanOfExamplarsClassifier():
     self.means = []
 
     for i in range(len(examplars)):
-      examplar_set = examplars[i]
+      examplar_set = examplars[i][:,0]
       features_mean = torch.zeros((feat_dim,))
+      
       for j in range(len(examplar_set)):
         tensor = transforms.ToTensor()(examplar_set[j]).unsqueeze(0).cuda()
         features = sefl.feature_extractor(tensor).squeeze(0).cpu()
@@ -16,7 +17,8 @@ class NearestMeanOfExamplarsClassifier():
       features_mean /= len(examplar_set)
       features_mean = features_mean / torch.norm(features_mean, p = 2)
       self.means.append(features_mean)
-      self.means = torch.stack(self.means)
+      
+    self.means = torch.stack(self.means)
       
         
   def classify(self, input_images):
