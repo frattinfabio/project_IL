@@ -107,7 +107,7 @@ class ResNet(nn.Module):
 
         return nn.Sequential(*layers)
     
-    def feature_extraction(self, x):
+    def features_extraction(self, x):
         out = F.relu(self.bn1(self.conv1(x)))
         out = self.layer1(out)
         out = self.layer2(out)
