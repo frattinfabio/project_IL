@@ -24,7 +24,7 @@ class NearestMeanOfExamplarsClassifier():
     features = features / torch.norm(features, p = 2)
     preds = []
     for feature in features:
-      distances = torch.pow(self.means.cuda() - feat, 2).sum(-1)
+      distances = torch.pow(self.means.cuda() - feature, 2).sum(-1)
       preds.append(distances.argmin().item())
     return np.array(preds)
 
