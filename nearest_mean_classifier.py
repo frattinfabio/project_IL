@@ -1,4 +1,5 @@
 import torch
+from torchvision import transforms
 
 class NearestMeanOfExamplarsClassifier():
   def __init__(self, feature_extractor, feat_dim, examplars):
@@ -11,7 +12,7 @@ class NearestMeanOfExamplarsClassifier():
       
       for j in range(len(examplar_set)):
         tensor = transforms.ToTensor()(examplar_set[j]).unsqueeze(0).cuda()
-        features = sefl.feature_extractor(tensor).squeeze(0).cpu()
+        features = self.feature_extractor(tensor).squeeze(0).cpu()
         features = features / torch.norm(features, p = 2)
         features_mean += features
       features_mean /= len(examplar_set)
