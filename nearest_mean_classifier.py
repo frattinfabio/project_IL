@@ -2,13 +2,8 @@ import numpy as np
 import torch
 from torchvision import transforms
 
-transform = transforms.Compose([
-                                transforms.ToTensor(),
-                                transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
-                                ])
-
 class NearestMeanOfExamplarsClassifier():
-  def __init__(self, net, examplars):
+  def __init__(self, net, examplars, transform):
     self.net = net
     self.net.train(False)
 
