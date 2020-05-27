@@ -3,15 +3,17 @@ from torchvision.datasets import VisionDataset
 import pandas as pd
 from PIL import Image
 
-# WARNING: it is required to have already downloaded the data under the [root] folder
-# execute the following lines of code before instantiting a SubCIFAR object
-# ----------------------------------------------------------------
-# from torchvsion.dataset.utils import  download_and_extract_archive
-# download_and_extract_archive("https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz", root, filename = "cifar-100-python.tar.gz", md5 = 'eb9058c3a382ffc7106e4002c42a8d85')
-# ----------------------------------------------------------------
-
 DEFAULT_LABELS = list(range(10))
 DEFAULT_SPLIT = [list(range(i*10, (i+1)*10)) for i in range(10)]
+
+data = {}
+targets = {}
+cifar_train = CIFAR100("./data", train = True, download = True)
+cifar_test = CIFAR100("./data", train = False, download = True)
+data["train"] = cifar_train.data
+data["test"] = cifar_test.data
+targets["train"] = cifar_train.targets
+targets["test"] = cifar_test.targets
 
 # SubCIFAR extracts from the CIFAR100 dataset a subset of classes
 # [root]: where to find the data
@@ -26,15 +28,14 @@ class SubCIFAR(VisionDataset):
 
     self.all_labels = [label for split in labels_split for label in split]
     self.stored_labels = labels
-    cifar_full = CIFAR100(root, train = train, download = False)
-    data = cifar_full.data
-    targets = cifar_full.targets
+    mode = "train" if train else "test"
+    
     images = []
     labels = []
-    for i in range(len(data)):
-      if targets[i] in self.stored_labels:
-        images.append(data[i])
-        labels.append(targets[i])
+    for i in range(len(data[mode])):
+      if targets[mode][i] in self.stored_labels:
+        images.append(data[mode][i])
+        labels.append(targets[mode][i])
     self.dataFrame = pd.DataFrame(zip(images, labels), columns=["image", "label"]) 
 
   def add_samples(self, new_samples):
