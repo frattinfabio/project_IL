@@ -6,14 +6,11 @@ from PIL import Image
 DEFAULT_LABELS = list(range(10))
 DEFAULT_SPLIT = [list(range(i*10, (i+1)*10)) for i in range(10)]
 
-data = {}
-targets = {}
+
 cifar_train = CIFAR100("./data", train = True, download = True)
 cifar_test = CIFAR100("./data", train = False, download = True)
-data["train"] = cifar_train.data
-data["test"] = cifar_test.data
-targets["train"] = cifar_train.targets
-targets["test"] = cifar_test.targets
+data = {"train": cifar_train.data, "test": cifar_test.data}
+targets = {"train": cifar_train.targets, "test": cifar_test.targets}
 
 # SubCIFAR extracts from the CIFAR100 dataset a subset of classes
 # [root]: where to find the data
