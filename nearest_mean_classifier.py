@@ -10,7 +10,12 @@ class NearestMeanOfExamplarsClassifier():
 
       self.means = []
       for i in range(len(examplars)):
-        examplar_set = examplars[i][:,0]
+        if i >= len(examplars) - len(train_dataset.stored_labels):
+          mapped_label = train_dataset.all_labels[i]
+          label_mask = (train_dataset.dataFrame["label"] == mapped_label)
+          examplar_set = train_dataset.dataFrame[label_mask]["image"].values
+        else:
+          examplar_set = examplars[i][:,0]
         features_mean = torch.zeros((net.linear.in_features,))
 
         for j in range(len(examplar_set)):
