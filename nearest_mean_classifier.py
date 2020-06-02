@@ -3,7 +3,7 @@ import torch
 from torchvision import transforms
 
 class NearestMeanOfExamplarsClassifier():
-  def __init__(self, net, examplars, transform):
+  def __init__(self, net, examplars, train_dataset, transform):
     with torch.no_grad():
       self.net = net
       self.net.train(False)
