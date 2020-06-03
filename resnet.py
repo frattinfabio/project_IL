@@ -123,6 +123,7 @@ class ResNet(nn.Module):
 
         return nn.Sequential(*layers)
     
+    # possible values for [output]: 'fc', 'features', 'all'
     def forward(self, x, output = 'fc'):
         x = self.conv1(x)
         x = self.bn1(x)
