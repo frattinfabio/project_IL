@@ -10,13 +10,15 @@ class NearestMeanOfExamplarsClassifier():
       self.net.train(False)
 
       self.means = []
-      for i in range(len(examplars)):
-        if i >= len(examplars) - len(train_dataset.stored_labels):
+      for i in range(len(examplars) + len(train_dataset.stored_labels)):
+        
+        if i >= len(examplars):
           mapped_label = train_dataset.all_labels[i]
           label_mask = (train_dataset.dataFrame["label"] == mapped_label)
           examplar_set = train_dataset.dataFrame[label_mask]["image"].values
         else:
           examplar_set = examplars[i][:,0]
+          
         features_mean = torch.zeros((net.fc.in_features,))
 
         for j in range(len(examplar_set)):
@@ -34,7 +36,7 @@ class NearestMeanOfExamplarsClassifier():
   def classify(self, input_images):
     with torch.no_grad():
       self.net.train(False)
-      features = self.net.features_extraction(input_images)
+      features = self.net(input_images, output = 'features')
       features = F.normalize(features, p = 2)
       preds = []
       for feature in features:
