@@ -137,7 +137,7 @@ class ResNet(nn.Module):
         return x
     
     def forward(self, x):
-        x = self.feature_extraction(x)
+        x = self.features_extraction(x)
         x = self.fc(x)
         return x
 
