@@ -123,7 +123,7 @@ class ResNet(nn.Module):
 
         return nn.Sequential(*layers)
     
-    def features_extraction(self, x):
+    def forward(self, x, output = 'fc'):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -133,13 +133,15 @@ class ResNet(nn.Module):
         x = self.layer3(x)
 
         x = self.avgpool(x)
-        x = x.view(x.size(0), -1)
-        return x
-    
-    def forward(self, x):
-        x = self.features_extraction(x)
-        x = self.fc(x)
-        return x
+        features = x.view(x.size(0), -1)
+        out = self.fc(features)
+        
+        if output == 'features':
+            return features
+        elif output == 'fc':
+            return out
+        else:
+            return out, features
 
 def resnet20(pretrained=False, **kwargs):
     n = 3
