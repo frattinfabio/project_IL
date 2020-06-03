@@ -16,7 +16,7 @@ class NearestMeanOfExamplarsClassifier():
           examplar_set = train_dataset.dataFrame[label_mask]["image"].values
         else:
           examplar_set = examplars[i][:,0]
-        features_mean = torch.zeros((net.linear.in_features,))
+        features_mean = torch.zeros((net.fc.in_features,))
 
         for j in range(len(examplar_set)):
           tensor = transform(examplar_set[j]).unsqueeze(0).cuda()
