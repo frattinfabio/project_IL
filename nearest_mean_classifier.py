@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import torch.nn.functional as F
 from torchvision import transforms
 
 class NearestMeanOfExamplarsClassifier():
@@ -34,7 +35,7 @@ class NearestMeanOfExamplarsClassifier():
     with torch.no_grad():
       self.net.train(False)
       features = self.net.features_extraction(input_images)
-      features = features / torch.norm(features, p = 2)
+      features = F.normalize(features, p = 2)
       preds = []
       for feature in features:
         distances = torch.pow(self.means.cuda() - feature, 2).sum(-1)
