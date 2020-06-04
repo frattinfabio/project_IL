@@ -23,7 +23,8 @@ class NearestMeanOfExamplarsClassifier():
 
         for j in range(len(examplar_set)):
           tensor = transform(examplar_set[j]).unsqueeze(0).cuda()
-          features = self.net.features_extraction(tensor).squeeze(0).cpu()
+          features = self.net(tensor, output = 'features')
+          features = features.squeeze(0).cpu()
           features = features / torch.norm(features, p = 2)
           features_mean += features
         features_mean /= len(examplar_set)
