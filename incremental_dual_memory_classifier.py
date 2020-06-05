@@ -8,7 +8,7 @@ class IncrementalDualMemoryClassifier():
         self.mean_examplars_scores = {}
         self.confidences = {}
 
-    def update(step, net, train_dataloader):
+    def update(self, step, net, train_dataloader):
         self.net = net
         self.current_step = step
 
@@ -44,7 +44,7 @@ class IncrementalDualMemoryClassifier():
         for i in range(num_new_classes):
             self.mean_train_scores[num_old_classes + i][1] /= num_images[num_old_classes + i]
 
-    def rectify(score, num_old_classes):
+    def rectify(self, score, num_old_classes):
         for i in range(num_old_classes):
             old_step = self.mean_train_scores[i][0]
             mu_p_class = self.mean_train_scores[i][1]
@@ -54,7 +54,7 @@ class IncrementalDualMemoryClassifier():
             score[i] = score[i] * (mu_p_class/mu_n_class) * (conf_n/conf_p)
         return score
 
-    def classify(images):
+    def classify(self, images):
         num_old_classes = len(self.mean_examplars_scores)
         preds = []
         with torch.no_grad():
