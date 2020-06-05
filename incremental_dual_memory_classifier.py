@@ -68,7 +68,7 @@ class IncrementalDualMemoryClassifier():
                 if pred >= num_old_classes:
                     # rectify scores for old classes
                     score = rectify(score, num_old_classes)
-                    pred = torch.argmax(score)
+                    pred = torch.argmax(score).item()
                 preds.append(pred)
 
         return torch.Tensor(preds).cuda()
