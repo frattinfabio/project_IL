@@ -1,4 +1,4 @@
-from torch.utils.data import DataLoader
+import torch
 
 class IncrementalDualMemoryClassifier():
     def __init__(self):
@@ -13,11 +13,12 @@ class IncrementalDualMemoryClassifier():
         self.current_step = step
 
         # initialize the scores for the new classes
+        self.confidences[step] = 0 
         num_new_classes = len(train_dataloader.dataset.stored_labels)
         num_old_classes = len(self.mean_train_scores)
         self.mean_examplars_scores = {k: 0 for k in range(num_old_classes)}
         for i in range(num_new_classes):
-            self.mean_train_scores[num_old_classes + i] = (step, 0)
+            self.mean_train_scores[num_old_classes + i] = [step, 0]   
         num_images = [0 for _ in range(num_new_classes + num_old_classes)]
 
         self.net = self.net.cuda()
@@ -30,6 +31,7 @@ class IncrementalDualMemoryClassifier():
                 for score, label in zip(scores, labels):
                     # exclude examplars from old classes for the updating of the scores
                     score = score.cpu()
+                    label = label.cpu().item()
                     self.confidences[step] += torch.max(score).item()
                     if label >= num_old_classes:
                         self.mean_train_scores[label][1] += score[label]
@@ -60,14 +62,14 @@ class IncrementalDualMemoryClassifier():
         with torch.no_grad():
             self.net = self.net.cuda()
             self.net.train(False)
-            scores = net(images)
+            scores = self.net(images)
 
             for score in scores:
                 score = score.cpu()
-                pred = torch.argmax(score)
+                pred = torch.argmax(score).item()
                 if pred >= num_old_classes:
                     # rectify scores for old classes
-                    score = rectify(score, num_old_classes)
+                    score = self.rectify(score, num_old_classes)
                     pred = torch.argmax(score).item()
                 preds.append(pred)
 
