@@ -1,14 +1,16 @@
 import torch
+from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import KNeighborsClassifier
+from imblearn.under_sampling import RandomUnderSampler
+
 
 class KNNClassifier():
-    def __init__(self, K = 3):
+    def __init__(self, k_values = [5, 7, 9, 11, 13]):
         self.net = None
-        self.K = K
-        # Inizialization of the classifier with K neighbors (3 as default value)
-        self.classifier = KNeighborsClassifier(n_neighbors = self.K)
-        
-    def update(self, net, train_dataloader):
+        self.k_param_grid = {"n_neighbors": k_values}
+        self.classifier = KNeighborsClassifier()
+
+    def update(self, step, net, train_dataloader, grid_search = True):
         self.net = net
         images_tot = None
         labels_tot = None
@@ -23,13 +25,19 @@ class KNNClassifier():
                     # Take all the images and labels to be fitted by the classifier
                     images_tot = torch.cat((images_tot, images), 0)
                     labels_tot = torch.cat((labels_tot, labels), 0)
-                  
+
             images_tot = images_tot.cuda()
             features = self.net(images_tot, output = 'features')
             features = features.cpu()
-            # Fit the classifier on the input features and the labels
-            self.classifier.fit(features, labels_tot)
-           
+
+            # undersampling to tackle the unbalance between the new data and old examplars
+            rus = RandomUnderSampler()
+            features, labels_tot = rus.fit_resample(features, labels_tot)
+            # selecting the best K through grid search with cross-validation
+            gs = GridSearchCV(estimator = self.classifier, param_grid = self.k_param_grid, cv = 4)
+            gs.fit(features, labels_tot)
+            self.classifier = gs.best_estimator_
+
     def classify(self, images):
         preds = []
         self.net = self.net.cuda()
