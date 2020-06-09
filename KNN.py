@@ -10,7 +10,7 @@ class KNNClassifier():
         self.k_param_grid = {"n_neighbors": k_values}
         self.classifier = KNeighborsClassifier()
 
-    def update(self, step, net, train_dataloader, grid_search = True):
+    def update(self, step, net, train_dataloader):
         self.net = net
         images_tot = None
         labels_tot = None
