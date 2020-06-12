@@ -16,7 +16,7 @@ class NearestMeanOfExamplarsClassifier():
   def update(self, step, net, train_dataloader):
       self.net = net
       n_known_classes = self.net.fc.out_features
-      self.means = [torch.zeros((self.net.fc.in_features,)) for _ in range(n_known_classes)]
+      self.means = [torch.zeros((self.net.fc.in_features,)).cuda() for _ in range(n_known_classes)]
       num_images = torch.zeros(n_known_classes,)
 
       with torch.no_grad():
@@ -34,8 +34,8 @@ class NearestMeanOfExamplarsClassifier():
         for label in range(n_known_classes):
           self.means[label] /= num_images[label]
 
-      self.means = torch.stack(self.means)
-      self.means = F.normalize(means, p = 2)
+      self.means = torch.stack(self.means).cuda()
+      self.means = F.normalize(self.means, p = 2)
 
   # predict the labels for the batch [input_images]
   # according to the nearest mean criterion 
