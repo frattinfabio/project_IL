@@ -5,10 +5,10 @@ from PIL import Image
 
 DEFAULT_LABELS = list(range(10))
 DEFAULT_SPLIT = [list(range(i*10, (i+1)*10)) for i in range(10)]
+DEFAULT_DATA_DIR = "./data"
 
-
-cifar_train = CIFAR100("./data", train = True, download = True)
-cifar_test = CIFAR100("./data", train = False, download = True)
+cifar_train = CIFAR100(DEFAULT_DATA_DIR, train = True, download = True)
+cifar_test = CIFAR100(DEFAULT_DATA_DIR, train = False, download = True)
 data = {"train": cifar_train.data, "test": cifar_test.data}
 targets = {"train": cifar_train.targets, "test": cifar_test.targets}
 
@@ -20,7 +20,7 @@ targets = {"train": cifar_train.targets, "test": cifar_test.targets}
 # [transform] : the transform performed on the training data
 class SubCIFAR(VisionDataset):
 
-  def __init__(self, root, labels_split = DEFAULT_SPLIT, labels = DEFAULT_LABELS, train=True, transform=None, target_transform=None):
+  def __init__(self, root = DEFAULT_DATA_DIR, labels_split = DEFAULT_SPLIT, labels = DEFAULT_LABELS, train=True, transform=None, target_transform=None):
     super(SubCIFAR, self).__init__(root, transform=transform, target_transform=target_transform)
 
     self.all_labels = [label for split in labels_split for label in split]
