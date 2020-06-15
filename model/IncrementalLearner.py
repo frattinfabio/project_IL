@@ -132,7 +132,7 @@ class IncrementalLearner():
                         dist_input = output[:, :-n_new_classes]
                         dist_target = prev_output
                 else:
-                    dist_input, dist_target = None
+                    dist_input, dist_target = None, None
 
                 self.optimizer.zero_grad()
 
