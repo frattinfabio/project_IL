@@ -21,7 +21,7 @@ class IncrementalLearner():
         self.num_groups = num_groups
         self.classes_per_group = num_classes//num_groups
 
-        self.train_parms = train_params
+        self.train_params = train_params
         self.approach_params = approach_params
 
         self.splitter = LabelsSplitter(num_classes, num_groups, seed = splitter_seed)
@@ -74,8 +74,8 @@ class IncrementalLearner():
             self.net.fc = nn.Linear(self.net.fc.in_features, (self.current_step + 1) * self.classes_per_group)
             self.net.fc.weight.data = torch.cat((old_weights, self.init_weights))
             parameters_to_optimize = self.net.parameters()
-            self.optimizer = optim.SGD(parameters_to_optimize , lr = train_params["LR"], momentum = train_params["MOMENTUM"], weight_decay = train_params["WEIGHT_DECAY"])
-            self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer, milestones = train_params["STEP_MILESTONES"], gamma = train_params["GAMMA"])
+            self.optimizer = optim.SGD(parameters_to_optimize , lr = self.train_params["LR"], momentum = self.train_params["MOMENTUM"], weight_decay = self.train_params["WEIGHT_DECAY"])
+            self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer, milestones = self.train_params["STEP_MILESTONES"], gamma = self.train_params["GAMMA"])
 
             # prepare the [ft_net] to be fine-tuned
             if self.use_variation:
@@ -184,8 +184,8 @@ class IncrementalLearner():
             self.net.train(False)
             for label in new_labels:
                 exemplar_set = []
-                dataset = SubCIFAR(labels_split = self.splitter.labels_split, labels = [label], train = True, transform = self.train_parms["test_transform"])
-                dataloader = DataLoader(dataset, batch_size = self.train_parms["BATCH_SIZE"], num_workers = 4 )
+                dataset = SubCIFAR(labels_split = self.splitter.labels_split, labels = [label], train = True, transform = self.train_params["test_transform"])
+                dataloader = DataLoader(dataset, batch_size = self.train_params["BATCH_SIZE"], num_workers = 4 )
                 features, label_mean = get_features_representation(dataloader)
                 exemplars_mean = torch.zeros((self.net.fc.in_features,)).cuda()
 
@@ -214,7 +214,7 @@ class IncrementalLearner():
             cudnn.benchmark
             log_step = 0
             for epoch in range(self.train_parms["NUM_EPOCHS"]):
-                print(f"\rEpoch {epoch + 1}/{self.train_parms['NUM_EPOCHS']}...", end = "")
+                print(f"\rEpoch {epoch + 1}/{self.train_params['NUM_EPOCHS']}...", end = "")
                 for images, labels in dataloader:
                     images = images.cuda()
                     labels = transform_labels_onehot(labels, self.n_known_classes).cuda()
