@@ -59,7 +59,7 @@ class IncrementalLearner():
         self.current_step = -1
         self.n_known_classes = 0
 
-    def step():
+    def step(self):
         self.current_step = self.current_step + 1
 
     def update_nets(self):
