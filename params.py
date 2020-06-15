@@ -5,6 +5,7 @@ train_params_base = {
 "STEP_MILESTONES": [49,63],
 "GAMMA": 0.2,
 "NUM_EPOCHS": 70,
+"BATCH_SIZE":128,
 "train_transform": transforms.Compose([
                                       transforms.RandomCrop(32, padding = 4),
                                       transforms.RandomHorizontalFlip(),
@@ -55,10 +56,10 @@ approach_params_variation = {
 
 def get_params(method):
     if method == "FINETUNING":
-        return train_parms_base, approach_params_finetuning
+        return train_params_base, approach_params_finetuning
     elif method == "LWF":
-        return train_parms_base, approach_params_lwf
+        return train_params_base, approach_params_lwf
     elif method == "ICARL":
-        return train_parmas_base, approach_params_icarl
+        return train_params_base, approach_params_icarl
     else:
-        return train_parms_base, approach_params_variation
+        return train_params_base, approach_params_variation
