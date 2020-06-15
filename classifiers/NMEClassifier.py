@@ -8,7 +8,7 @@ from torchvision import transforms
 # [examplars]: the examplars of the old classes
 # [train_dataset]: the SubCIFAR object containing the data of the new classes
 # [transform]: transform image into tensor and normalize
-class NearestMeanOfExamplarsClassifier():
+class NMEClassifier():
   def __init__(self):
       self.net = None
       self.means = None
