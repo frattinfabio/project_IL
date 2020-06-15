@@ -1,3 +1,5 @@
+from torchvision import transforms
+
 train_params_base = {
 "LR": 2 ,
 "MOMENTUM": 0.9 ,
