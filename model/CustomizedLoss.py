@@ -26,7 +26,7 @@ def _compute_icarl_loss(input, target):
     return crit(input, target)
 
 def _compute_kldiv_loss(input, target):
-    crit = .nn.KLDivLoss(reduction = "mean")
+    crit = nn.KLDivLoss(reduction = "mean")
     input = torch.log_softmax(input, dim = 1)
     target = torch.softmax(target, dim = 1)
     return crit(input, target)
