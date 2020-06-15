@@ -14,7 +14,7 @@ def _compute_hinton_loss(input, target):
     target = torch.softmax(target/T, dim = 1)
     loss = torch.sum(input * target, dim = 1, keepdim = False)
     loss = -torch.mean(loss, dim = 0, keepdim = False)
-    return loss
+    return T*T*loss
 
 def _compute_bce_loss(input, target):
     crit = nn.BCEWithLogitsLoss(reduction = "mean")
