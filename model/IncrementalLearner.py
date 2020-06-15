@@ -146,7 +146,7 @@ class IncrementalLearner():
             batch_features = []
             tot_images = 0
 
-            self.train(False)
+            self.net.train(False)
             with torch.no_grad():
                 for images, _ in dataloader:
                     images = images.cuda()
