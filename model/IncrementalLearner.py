@@ -13,7 +13,7 @@ from projectIL.model.CustomizedLoss import CustomizedLoss
 
 class IncrementalLearner():
 
-    def __init__(num_classes, num_groups, splitter_seed, approach_params, train_params):
+    def __init__(self, num_classes, num_groups, splitter_seed, approach_params, train_params):
         self.num_classes = num_classes
         self.num_groups = num_groups
         self.classes_per_group = num_classes//num_groups
@@ -30,9 +30,9 @@ class IncrementalLearner():
         self.net = resnet32()
         self.net.fc = nn.Linear(self.net.fc.in_features, self.classes_per_group)
         self.init_weights = torch.nn.init.kaiming_normal_(self.net.fc.weight)
-        parameters_to_optimize = net.parameters()
+        parameters_to_optimize = self.net.parameters()
         self.optimizer = optim.SGD(parameters_to_optimize , lr = train_params["LR"], momentum = train_params["MOMENTUM"], weight_decay = train_params["WEIGHT_DECAY"])
-        self.scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones = train_params["STEP_MILESTONES"], gamma = train_params["GAMMA"])
+        self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer, milestones = train_params["STEP_MILESTONES"], gamma = train_params["GAMMA"])
 
         self.loss = CustomizedLoss(approach_params["classification_loss"], approach_params["distillation_loss"])
 
@@ -50,6 +50,8 @@ class IncrementalLearner():
         if self.use_exemplars:
             self.exemplars = []
             self.K = approach_params["n_exemplars"]
+        else:
+            self.exemplars = None
 
         self.current_step = -1
         self.n_known_classes = 0
