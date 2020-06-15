@@ -201,7 +201,7 @@ class IncrementalLearner():
                     exemplar = dataloader.dataset.dataFrame.iloc[idx]
                     exemplar_set.append((exemplar["image"], exemplar["label"]))
 
-                self.examplars.append(np.array(examplar_set))
+                self.exemplars.append(np.array(examplar_set))
 
     def train_ft(self, dataloader):
         if self.use_variation:
