@@ -54,7 +54,7 @@ approach_params_icarl = {
 }
 
 approach_params_variation = {
-"classification_loss": "bce",
+"classification_loss": "icarl",
 "distillation_loss": "icarl",
 "classifier": NMEClassifier(),
 "use_distillation" : True,
