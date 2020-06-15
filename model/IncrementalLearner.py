@@ -6,6 +6,7 @@ from torch.backends import cudnn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import random
+import numpy as np
 
 from project_IL.utils import transform_labels_onehot
 from project_IL.data_handler.SubCIFAR import SubCIFAR
