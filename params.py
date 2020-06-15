@@ -48,7 +48,7 @@ approach_params_icarl = {
 "use_distillation" : True,
 "use_variation" : False,
 "use_exemplars": True,
-"n_exemplars": 2000
+"n_exemplars": 2000,
 "exemplar_selection" : "random"
 }
 
