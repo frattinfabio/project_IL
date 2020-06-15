@@ -1,6 +1,6 @@
 import torch
 
-class IncrementalDualMemoryClassifier():
+class IL2MClassifier():
     def __init__(self):
         self.net = None
         self.current_step = None
