@@ -170,7 +170,7 @@ class IncrementalLearner():
             print("Updating exemplars...")
 
             n_old_classes = self.n_known_classes - self.classes_per_group
-            m = self.K // n_known_classes
+            m = self.K // self.n_known_classes
             new_labels = self.splitter.labels_split[self.current_step]
 
             if self.current_step > 0:
