@@ -102,8 +102,8 @@ class IncrementalLearner():
 
         cudnn.benchmarks
         log_step = 0
-        for epoch in range(self.train_parms["NUM_EPOCHS"]):
-            print(f"\rEpoch {epoch + 1}/{self.train_parms['NUM_EPOCHS']}...", end = "")
+        for epoch in range(self.train_params["NUM_EPOCHS"]):
+            print(f"\rEpoch {epoch + 1}/{self.train_params['NUM_EPOCHS']}...", end = "")
             for images, labels in dataloader:
                 images = images.cuda()
                 labels = transform_labels_onehot(labels, self.n_known_classes).cuda()
@@ -213,7 +213,7 @@ class IncrementalLearner():
             self.ft_net.train(True)
             cudnn.benchmark
             log_step = 0
-            for epoch in range(self.train_parms["NUM_EPOCHS"]):
+            for epoch in range(self.train_params["NUM_EPOCHS"]):
                 print(f"\rEpoch {epoch + 1}/{self.train_params['NUM_EPOCHS']}...", end = "")
                 for images, labels in dataloader:
                     images = images.cuda()
