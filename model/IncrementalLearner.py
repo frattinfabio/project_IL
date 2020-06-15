@@ -210,7 +210,7 @@ class IncrementalLearner():
             self.n_known_classes = (self.current_step + 1) * self.classes_per_group
             self.ft_net = self.net.cuda()
             self.ft_net.train(True)
-            cudnn.benchmarks
+            cudnn.benchmark
             log_step = 0
             for epoch in range(self.train_parms["NUM_EPOCHS"]):
                 print(f"\rEpoch {epoch + 1}/{self.train_parms['NUM_EPOCHS']}...", end = "")
