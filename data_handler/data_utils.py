@@ -1,4 +1,5 @@
 from project_IL.data_handler.SubCIFAR import SubCIFAR
+from torch.utils.data import DataLoader
 
 def load_data(step, labels_split, exemplars = None):
 
