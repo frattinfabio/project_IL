@@ -208,7 +208,7 @@ class IncrementalLearner():
         if self.use_variation:
             print("Training the ft-net...")
             self.n_known_classes = (self.current_step + 1) * self.classes_per_group
-            self.ft_net = self.net.cuda()
+            self.ft_net = self.ft_net.cuda()
             self.ft_net.train(True)
             cudnn.benchmark
             log_step = 0
@@ -217,7 +217,7 @@ class IncrementalLearner():
                 for images, labels in dataloader:
                     images = images.cuda()
                     labels = transform_labels_onehot(labels, self.n_known_classes).cuda()
-                    output = self.net(images)
+                    output = self.ft_net(images)
                     self.ft_optimizer.zero_grad()
                     loss = self.ft_loss(output, labels)
                     loss.backward()
