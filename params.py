@@ -1,5 +1,6 @@
 from torchvision import transforms
 from project_IL.classifiers.NMEClassifier import NMEClassifier
+from project_IL.classifiers.FCClassifier import FCClassifier
 from project_IL.classifiers.KNNClassifier import KNNClassifier
 from project_IL.classifiers.IL2MClassifier import IL2MClassifier
 
@@ -25,7 +26,7 @@ train_params_base = {
 
 approach_params_finetuning = {
 "classification_loss": "bce",
-"classifier": None,
+"classifier": FCClassifier(),
 "distillation_loss": None,
 "use_distillation" : False,
 "use_variation" : False,
@@ -35,7 +36,7 @@ approach_params_finetuning = {
 approach_params_lwf = {
 "classification_loss": "bce",
 "distillation_loss": "icarl",
-"classifier": None,
+"classifier": FCClassifier(),
 "use_distillation" : False,
 "use_variation" : False,
 "use_exemplars": False,
