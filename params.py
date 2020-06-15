@@ -50,7 +50,7 @@ approach_params_icarl = {
 "use_variation" : False,
 "use_exemplars": True,
 "n_exemplars": 2000,
-"exemplar_selection" : "random"
+"exemplars_selection" : "random"
 }
 
 approach_params_variation = {
@@ -61,7 +61,7 @@ approach_params_variation = {
 "use_variation" : True,
 "use_exemplars": True,
 "n_exemplars": 2000,
-"exemplar_selection" : "random"
+"exemplars_selection" : "random"
 }
 
 def get_params(method):
