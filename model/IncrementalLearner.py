@@ -103,7 +103,7 @@ class IncrementalLearner():
             print(f"\rEpoch {epoch + 1}/{self.train_parms['NUM_EPOCHS']}...", end = "")
             for images, labels in dataloader:
                 images = images.cuda()
-                labels = transforms_labels_onehot(labels, self.n_known_classes).cuda()
+                labels = transform_labels_onehot(labels, self.n_known_classes).cuda()
                 output, features = self.net(images, output = 'all')
 
                 # defining input and targets for classification and distillation loss
@@ -214,7 +214,7 @@ class IncrementalLearner():
                 print(f"\rEpoch {epoch + 1}/{self.train_parms['NUM_EPOCHS']}...", end = "")
                 for images, labels in dataloader:
                     images = images.cuda()
-                    labels = transforms_labels_onehot(labels, self.n_known_classes).cuda()
+                    labels = transform_labels_onehot(labels, self.n_known_classes).cuda()
                     output = self.net(images)
                     self.ft_optimizer.zero_grad()
                     loss = self.ft_loss(output, labels)
