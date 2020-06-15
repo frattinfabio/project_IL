@@ -5,6 +5,7 @@ import torch.optim as optim
 from torch.backends import cudnn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
+import random
 
 from project_IL.utils import transform_labels_onehot
 from project_IL.data_handler.SubCIFAR import SubCIFAR
@@ -198,9 +199,9 @@ class IncrementalLearner():
 
                 for idx in idx_taken:
                     exemplar = dataloader.dataset.dataFrame.iloc[idx]
-                    exemplars_set.append((exemplar["image"], exemplar["label"]))
+                    exemplar_set.append((exemplar["image"], exemplar["label"]))
 
-                self.examplars.append(np.array(examplars_set))
+                self.examplars.append(np.array(examplar_set))
 
     def train_ft(self, dataloader):
         if self.use_variation:
