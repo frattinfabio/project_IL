@@ -1,7 +1,7 @@
 from project_IL.data_handler.SubCIFAR import SubCIFAR
 from torch.utils.data import DataLoader
 
-def load_data(step, labels_split, exemplars = None):
+def load_data(step, labels_split, train_params, exemplars = None):
 
   new_labels = labels_split[step]
   old_labels = [label for split in labels_split[:step] for label in split]
