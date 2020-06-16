@@ -4,10 +4,6 @@ import torch.nn.functional as F
 from torchvision import transforms
 
 # Nearest mean of examplars classifier
-# [net]: the feature extractor
-# [examplars]: the examplars of the old classes
-# [train_dataset]: the SubCIFAR object containing the data of the new classes
-# [transform]: transform image into tensor and normalize
 class NMEClassifier():
   def __init__(self):
       self.net = None
@@ -26,7 +22,7 @@ class NMEClassifier():
         for images, labels in train_dataloader:
           images = images.cuda()
           labels = labels.cuda()
-          features = net(images, output = 'features')
+          features = self.net(images, output = 'features')
           features = F.normalize(features, p = 2)
           for feature, label in zip(features, labels):
             self.means[label] += feature
