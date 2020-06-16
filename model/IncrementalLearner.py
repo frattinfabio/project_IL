@@ -158,7 +158,7 @@ class IncrementalLearner():
                     mean += torch.sum(features)
                     tot_images += features.shape[0]
                 mean /= tot_images
-                batch_features = torch.cat(batch_features).cuda()
+                batch_features = torch.stack(batch_features).cuda()
 
             return F.normalize(batch_features, p = 2), mean/torch.norm(mean, p = 2)
 
