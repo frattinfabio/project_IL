@@ -37,7 +37,7 @@ class IncrementalLearner():
         self.optimizer = optim.SGD(parameters_to_optimize , lr = train_params["LR"], momentum = train_params["MOMENTUM"], weight_decay = train_params["WEIGHT_DECAY"])
         self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer, milestones = train_params["STEP_MILESTONES"], gamma = train_params["GAMMA"])
 
-        self.loss = CustomizedLoss(approach_params["classification_loss"], approach_params["distillation_loss"])
+        self.loss_criterion = CustomizedLoss(approach_params["classification_loss"], approach_params["distillation_loss"])
 
         # setting the enviroment according to the [approach_params]
         self.use_distillation = approach_params["use_distillation"]
@@ -49,7 +49,7 @@ class IncrementalLearner():
                 self.ft_net = None
                 self.ft_optimizer = None
                 self.ft_scheduler = None
-                self.ft_loss = CustomizedLoss(approach_params["classification_loss"], None)
+                self.ft_loss_criterion = CustomizedLoss(approach_params["classification_loss"], None)
         if self.use_exemplars:
             self.exemplars = []
             self.K = approach_params["n_exemplars"]
@@ -136,7 +136,7 @@ class IncrementalLearner():
 
                 self.optimizer.zero_grad()
 
-                loss = self.loss(class_input, class_target, dist_input, dist_target)
+                loss = self.loss_criterion(class_input, class_target, dist_input, dist_target)
                 loss.backward()
                 self.optimizer.step()
                 log_step = log_step + 1
@@ -220,7 +220,7 @@ class IncrementalLearner():
                     labels = transform_labels_onehot(labels, self.n_known_classes).cuda()
                     output = self.ft_net(images)
                     self.ft_optimizer.zero_grad()
-                    loss = self.ft_loss(output, labels, None, None)
+                    loss = self.ft_loss_criterion(output, labels, None, None)
                     loss.backward()
                     self.ft_optimizer.step()
                     log_step = log_step + 1
