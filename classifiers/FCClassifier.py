@@ -11,8 +11,8 @@ class FCClassifier():
       self.net = net
 
   def classify(self, input_images):
+    self.net = self.net.cuda()
     self.net.train(False)
-    self.net.cuda()
     with torch.no_grad():
       output = self.net(input_images, output = 'fc')
       preds = torch.argmax(output, dim = 1).cuda()
