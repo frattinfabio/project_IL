@@ -61,6 +61,7 @@ class IncrementalLearner():
 
     def step(self):
         self.current_step = self.current_step + 1
+        self.n_known_classes = self.n_known_classes + self.classes_per_group
 
     def update_nets(self):
         if self.current_step > 0:
@@ -71,7 +72,7 @@ class IncrementalLearner():
 
             # update the main [net]
             old_weights = self.net.fc.weight.data
-            self.net.fc = nn.Linear(self.net.fc.in_features, (self.current_step + 1) * self.classes_per_group)
+            self.net.fc = nn.Linear(self.net.fc.in_features, self.n_known_classes)
             self.net.fc.weight.data = torch.cat((old_weights, self.init_weights))
             parameters_to_optimize = self.net.parameters()
             self.optimizer = optim.SGD(parameters_to_optimize , lr = self.train_params["LR"], momentum = self.train_params["MOMENTUM"], weight_decay = self.train_params["WEIGHT_DECAY"])
@@ -87,7 +88,6 @@ class IncrementalLearner():
     def train(self, dataloader):
         print("Training the main net...")
         n_new_classes = self.classes_per_group
-        self.n_known_classes = (self.current_step + 1) * self.classes_per_group
 
         # bringing all the nets to cuda
         self.net = self.net.cuda()
@@ -172,8 +172,8 @@ class IncrementalLearner():
         if self.use_exemplars:
             print("Updating exemplars...")
 
-            n_old_classes = self.n_known_classes - self.classes_per_group
             m = self.K // self.n_known_classes
+            n_old_classes = self.n_known_classes - self.classes_per_group
             new_labels = self.splitter.labels_split[self.current_step]
 
             if self.current_step > 0:
@@ -208,7 +208,6 @@ class IncrementalLearner():
     def train_ft(self, dataloader):
         if self.use_variation:
             print("Training the ft-net...")
-            self.n_known_classes = (self.current_step + 1) * self.classes_per_group
             self.ft_net = self.ft_net.cuda()
             self.ft_net.train(True)
             cudnn.benchmark
