@@ -62,8 +62,12 @@ class CustomizedLoss():
         if self.distillation is not None and dist_input is not None and dist_target is not None:
             n_new_classes = class_input.shape[1]
             n_old_classes = dist_input.shape[1]
-            class_ratio = n_new_classes/(n_new_classes+n_old_classes)
-            dist_ratio = 1 - class_ratio
+            if self.distillation == "lfc":
+                class_ratio = 1
+                dist_ratio = 10 * ((n_new_classes/n_old_classes)**0.5)
+            else:
+                class_ratio = n_new_classes/(n_new_classes+n_old_classes)
+                dist_ratio = 1 - class_ratio
 
             dist_loss =  self.loss_computer[self.distillation](dist_input, dist_target)
             tot_loss = class_ratio*class_loss + dist_ratio*dist_loss
