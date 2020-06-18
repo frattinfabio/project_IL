@@ -25,11 +25,8 @@ class IncrementalLearner():
         self.approach_params = approach_params
 
         self.splitter = LabelsSplitter(num_classes, num_groups, seed = splitter_seed)
-
-        # initializing the nets
-        # [net]: the main net incrementally trained
-        # [prev_net]: the version of the net at the previous step, useful for the distillation term
-        # [ft_net]: the fine-tuned network for the variation, useful for the classification term
+        
+        # [net] : the main net to be trained
         self.net = resnet32()
         self.net.fc = nn.Linear(self.net.fc.in_features, self.classes_per_group)
         self.init_weights = torch.nn.init.kaiming_normal_(self.net.fc.weight)
@@ -44,8 +41,10 @@ class IncrementalLearner():
         self.use_variation = self.use_distillation and approach_params["use_variation"]
         self.use_exemplars = approach_params["use_exemplars"]
         if self.use_distillation:
+            # [prev_net]: the version of the net at the previous step, useful for the distillation term
             self.prev_net = None
             if self.use_variation:
+                # [ft_net]: the fine-tuned network for the variation, useful for the classification term
                 self.ft_net = None
                 self.ft_optimizer = None
                 self.ft_scheduler = None
@@ -59,6 +58,7 @@ class IncrementalLearner():
         self.current_step = -1
         self.n_known_classes = 0
 
+    # called each time a new incremental step
     def step(self):
         self.current_step = self.current_step + 1
         self.n_known_classes = self.n_known_classes + self.classes_per_group
