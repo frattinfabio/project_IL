@@ -58,11 +58,12 @@ class IncrementalLearner():
         self.current_step = -1
         self.n_known_classes = 0
 
-    # called each time a new incremental step
+    # called before starting a new incremental step 
     def step(self):
         self.current_step = self.current_step + 1
         self.n_known_classes = self.n_known_classes + self.classes_per_group
-
+        
+    #updat the networks for the new incremental step
     def update_nets(self):
         if self.current_step > 0:
             print("Updating networks...")
@@ -70,7 +71,7 @@ class IncrementalLearner():
             if self.use_distillation:
                 self.prev_net = copy.deepcopy(self.net)
 
-            # update the main [net]
+            # add new output nodes to the last layer of the [net]
             old_weights = self.net.fc.weight.data
             self.net.fc = nn.Linear(self.net.fc.in_features, self.n_known_classes)
             self.net.fc.weight.data = torch.cat((old_weights, self.init_weights))
@@ -85,11 +86,11 @@ class IncrementalLearner():
                 self.ft_optimizer = optim.SGD(parameters_to_optimize , lr = self.train_params["LR"], momentum = self.train_params["MOMENTUM"], weight_decay = self.train_params["WEIGHT_DECAY"])
                 self.ft_scheduler = optim.lr_scheduler.MultiStepLR(self.ft_optimizer, milestones = self.train_params["STEP_MILESTONES"], gamma = self.train_params["GAMMA"])
 
+    # train the main [net] according to the [train_params] and [approach_params]
     def train(self, dataloader):
         print("Training the main net...")
         n_new_classes = self.classes_per_group
 
-        # bringing all the nets to cuda
         self.net = self.net.cuda()
         self.net.train(True)
         if self.current_step > 0:
@@ -110,7 +111,7 @@ class IncrementalLearner():
                 output, features = self.net(images, output = 'all')
 
                 # defining input and targets for classification and distillation loss
-                # depending on the type of loss
+                  
                 class_input = output
                 class_target = labels
 
@@ -123,6 +124,7 @@ class IncrementalLearner():
                         class_target = ft_output[:, -n_new_classes:]
                     else:
                         class_target = class_target[:, -n_new_classes:]
+                  
                     prev_output, prev_features = self.prev_net(images, output = 'all')
                     # "lfc" loss requires the previous and current features to compute the loss
                     if self.approach_params["distillation_loss"] == "lfc":
@@ -135,7 +137,7 @@ class IncrementalLearner():
                     dist_input, dist_target = None, None
 
                 self.optimizer.zero_grad()
-
+                
                 loss = self.loss_criterion(class_input, class_target, dist_input, dist_target)
                 loss.backward()
                 self.optimizer.step()
@@ -143,7 +145,9 @@ class IncrementalLearner():
             self.scheduler.step()
         print("")
 
+    # update the exemplars
     def update_exemplars(self):
+        # returns the feature representation of the given class-dataloader and the class-mean (normalized)
         def get_features_representation(dataloader):
             mean = torch.zeros((self.net.fc.in_features,)).cuda()
             batch_features = []
@@ -162,10 +166,12 @@ class IncrementalLearner():
 
             return F.normalize(batch_features, p = 2), mean/torch.norm(mean, p = 2)
 
+        # get the next exemplar based on the herding selection criterion
         def get_closest_exemplar_idx(label_mean, features, idx_taken):
             features = F.normalize(features, p = 2)
             distances = torch.pow(label_mean - features, 2).sum(-1)
             for idx in idx_taken:
+                 # forcing to avoid to take the already taken indexes
                 distances[idx] = 100000
             return distances.argmin().item()
 
@@ -175,7 +181,8 @@ class IncrementalLearner():
             m = self.K // self.n_known_classes
             n_old_classes = self.n_known_classes - self.classes_per_group
             new_labels = self.splitter.labels_split[self.current_step]
-
+            
+            # reducing the number of exemplars for the old classes
             if self.current_step > 0:
                 for i in range(n_old_classes):
                     self.exemplars[i] = self.exemplars[i][:m]
@@ -184,6 +191,7 @@ class IncrementalLearner():
             self.net.train(False)
             for label in new_labels:
                 exemplar_set = []
+                # loading data for the [label] class only
                 dataset = SubCIFAR(labels_split = self.splitter.labels_split, labels = [label], train = True, transform = self.train_params["test_transform"])
                 dataloader = DataLoader(dataset, batch_size = self.train_params["BATCH_SIZE"], num_workers = 4 )
                 features, label_mean = get_features_representation(dataloader)
@@ -197,6 +205,7 @@ class IncrementalLearner():
                         exemplars_mean += features[idx]
                         idx_taken.append(idx)
                 else:
+                    # random selecting the exemplars
                     idx_taken = random.sample(range(len(dataset)), num_exemplars)
 
                 for idx in idx_taken:
@@ -205,6 +214,7 @@ class IncrementalLearner():
 
                 self.exemplars.append(np.array(exemplar_set))
 
+    # training the [ft-net] with a fine-tuning approach (classification loss only using new classes data)
     def train_ft(self, dataloader):
         if self.use_variation:
             print("Training the ft-net...")
