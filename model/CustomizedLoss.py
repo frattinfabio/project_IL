@@ -45,8 +45,7 @@ def _compute_lfc_loss(input, target):
     return loss
 
 # the CustomizedLoss compute a loss made by 2 terms:
-# a [classification] term
-# a d
+# a [classification] and a [distillation] term
 class CustomizedLoss():
     def __init__(self, classification, distillation):
         self.classification = classification
