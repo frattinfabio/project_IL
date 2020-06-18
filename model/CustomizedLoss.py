@@ -8,7 +8,7 @@ def _compute_cross_entropy_loss(input, target):
     loss = -torch.mean(loss, dim = 0, keepdim = False)
     return loss
 
-def compute_sigmoid_cross_entropy_loss(input, target):
+def _compute_sigmoid_cross_entropy_loss(input, target):
     input = torch.nn.LogSigmoid()(input)
     loss = torch.sum(input * target, dim = 1, keepdim = False)
     loss = -torch.mean(loss, dim = 0, keepdim = False)
@@ -31,7 +31,7 @@ def _compute_icarl_loss(input, target):
     target = nn.Sigmoid()(target)
     return crit(input, target)
 
-def compute_icarl_cross_entropy_loss(input, target):
+def _compute_icarl_cross_entropy_loss(input, target):
     input = torch.nn.LogSigmoid()(input)
     target = torch.nn.Sigmoid()(target)
     loss = torch.sum(input * target, dim = 1, keepdim = False)
