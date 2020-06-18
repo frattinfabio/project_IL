@@ -4,7 +4,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from imblearn.under_sampling import RandomUnderSampler
 
 # classifier using the NN policy
-# [k_values]: the n_neighbors value to be tried 
+# [k_values]: the n_neighbors value to be tried during the grid search
 class KNNClassifier():
     def __init__(self, k_values = [9, 11, 13, 15]):
         self.net = None
@@ -31,7 +31,8 @@ class KNNClassifier():
             features = self.net(images_tot, output = 'features')
             features = features.cpu()
 
-            # undersampling to tackle the unbalance between the new data and old examplars
+            # random undersampling to tackle the unbalance between the new data and old examplars
+            # it is like simulating the random selection of the exemplars
             rus = RandomUnderSampler()
             features, labels_tot = rus.fit_resample(features, labels_tot)
             # selecting the best K through grid search with cross-validation
@@ -46,6 +47,5 @@ class KNNClassifier():
         with torch.no_grad():
             features = self.net(images, output = 'features')
             features = features.cpu()
-            # Classifier's predictions
             preds = self.classifier.predict(features)
         return torch.Tensor(preds).cuda()
