@@ -8,7 +8,9 @@ class NMEClassifier():
   def __init__(self):
       self.net = None
       self.means = None
-      
+  
+  # the update function basically re-computes the class means
+  # all the new classes data are used, while only the exemplars for the old classes
   def update(self, step, net, train_dataloader):
       self.net = net
       n_known_classes = self.net.fc.out_features
