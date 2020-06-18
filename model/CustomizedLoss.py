@@ -57,7 +57,7 @@ class CustomizedLoss():
         self.distillation = distillation
         self.loss_computer = {
         "bce": _compute_bce_loss,
-        "sigmoid_ce": _compute_exp_cross_entropy_loss,
+        "exp_ce": _compute_exp_cross_entropy_loss,
         "icarl_ce": _compute_icarl_cross_entropy_loss,
         "icarl": _compute_icarl_loss,
         "ce": _compute_cross_entropy_loss,
