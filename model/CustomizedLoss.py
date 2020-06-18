@@ -3,13 +3,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 def _compute_cross_entropy_loss(input, target):
-    input = torch.log_softmax(input, dim = 1)
+    input = torch.log(torch.exp(input)/(1+torch.exp(input)))
     loss = torch.sum(input * target, dim = 1, keepdim = False)
     loss = -torch.mean(loss, dim = 0, keepdim = False)
     return loss
 
 def _compute_sigmoid_cross_entropy_loss(input, target):
-    input = torch.nn.LogSigmoid()(input)
+    input = torch.exp(input)
     loss = torch.sum(input * target, dim = 1, keepdim = False)
     loss = -torch.mean(loss, dim = 0, keepdim = False)
     return loss
@@ -32,8 +32,8 @@ def _compute_icarl_loss(input, target):
     return crit(input, target)
 
 def _compute_icarl_cross_entropy_loss(input, target):
-    input = torch.nn.LogSigmoid()(input)
-    target = torch.nn.Sigmoid()(target)
+    input = torch.log(torch.exp(input)/(1+torch.exp(input)))
+    target = torch.exp(target)/(1+torch.exp(target))
     loss = torch.sum(input * target, dim = 1, keepdim = False)
     loss = -torch.mean(loss, dim = 0, keepdim = False)
     return loss
