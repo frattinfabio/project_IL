@@ -8,6 +8,13 @@ def _compute_cross_entropy_loss(input, target):
     loss = -torch.mean(loss, dim = 0, keepdim = False)
     return loss
 
+def _compute_soft_cross_entropy_loss(input, target):
+    input = torch.log_softmax(input, dim = 1)
+    target = torch.nn.Sigmoid()(target)
+    loss = torch.sum(input * target, dim = 1, keepdim = False)
+    loss = -torch.mean(loss, dim = 0, keepdim = False)
+    return loss
+
 # distillation loss as described by Hinton et. al
 def _compute_hinton_loss(input, target):
     T = 2
@@ -23,7 +30,7 @@ def _compute_bce_loss(input, target):
     return crit(input, target)
 
 # bce with soft targets: distillation loss as described in iCaRL
-def _compute_icarl_loss(input, target):
+def _compute_soft_bce_loss(input, target):
     crit = nn.BCEWithLogitsLoss(reduction = "mean")
     target = nn.Sigmoid()(target)
     return crit(input, target)
@@ -52,8 +59,9 @@ class CustomizedLoss():
         self.distillation = distillation
         self.loss_computer = {
         "bce": _compute_bce_loss,
-        "icarl": _compute_icarl_loss,
+        "icarl": _compute_soft_bce_loss,
         "ce": _compute_cross_entropy_loss,
+        "icarl_ce": _compute_soft_cross_entropy_loss,
         "hinton": _compute_hinton_loss,
         "kldiv": _compute_kldiv_loss,
         "lfc": _compute_lfc_loss
