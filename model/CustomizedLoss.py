@@ -8,6 +8,19 @@ def _compute_cross_entropy_loss(input, target):
     loss = -torch.mean(loss, dim = 0, keepdim = False)
     return loss
 
+def compute_sigmoid_cross_entropy_loss(input, target):
+    input = torch.nn.LogSigmoid()(input)
+    loss = torch.sum(input * target, dim = 1, keepdim = False)
+    loss = -torch.mean(loss, dim = 0, keepdim = False)
+    return loss
+
+def compute_icarl_cross_entropy_loss(input, target):
+    input = torch.nn.LogSigmoid()(input)
+    target = torch.nn.Sigmoid()(target)
+    loss = torch.sum(input * target, dim = 1, keepdim = False)
+    loss = -torch.mean(loss, dim = 0, keepdim = False)
+    return loss
+
 def _compute_hinton_loss(input, target):
     T = 2
     input = torch.log_softmax(input/T, dim = 1)
@@ -44,6 +57,8 @@ class CustomizedLoss():
         self.distillation = distillation
         self.loss_computer = {
         "bce": _compute_bce_loss,
+        "sigmoid_ce": _compute_sigmoid_cross_entropy_loss,
+        "icarl_ce": _compute_icarl_cross_entropy_loss
         "icarl": _compute_icarl_loss,
         "ce": _compute_cross_entropy_loss,
         "hinton": _compute_hinton_loss,
