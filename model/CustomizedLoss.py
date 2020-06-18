@@ -3,13 +3,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 def _compute_cross_entropy_loss(input, target):
-    input = torch.log(torch.exp(input)/(1+torch.exp(input)))
+    input = torch.nn.Sigmoid()(input)
     loss = torch.sum(input * target, dim = 1, keepdim = False)
     loss = -torch.mean(loss, dim = 0, keepdim = False)
     return loss
 
-def _compute_sigmoid_cross_entropy_loss(input, target):
-    input = torch.exp(input)
+def _compute_exp_cross_entropy_loss(input, target):
+    input = torch.log(torch.exp(input)/(1+torch.exp(input)))
     loss = torch.sum(input * target, dim = 1, keepdim = False)
     loss = -torch.mean(loss, dim = 0, keepdim = False)
     return loss
@@ -57,7 +57,7 @@ class CustomizedLoss():
         self.distillation = distillation
         self.loss_computer = {
         "bce": _compute_bce_loss,
-        "sigmoid_ce": _compute_sigmoid_cross_entropy_loss,
+        "sigmoid_ce": _compute_exp_cross_entropy_loss,
         "icarl_ce": _compute_icarl_cross_entropy_loss,
         "icarl": _compute_icarl_loss,
         "ce": _compute_cross_entropy_loss,
