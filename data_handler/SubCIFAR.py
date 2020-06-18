@@ -7,8 +7,9 @@ DEFAULT_LABELS = list(range(10))
 DEFAULT_SPLIT = [list(range(i*10, (i+1)*10)) for i in range(10)]
 DEFAULT_DATA_DIR = "./data"
 
+# loading the cifar dataset
 cifar_train = CIFAR100(DEFAULT_DATA_DIR, train = True, download = True)
-cifar_test = CIFAR100(DEFAULT_DATA_DIR, train = False, download = True)
+cifar_test = CIFAR100(DEFAULT_DATA_DIR, train = False, download = False)
 data = {"train": cifar_train.data, "test": cifar_test.data}
 targets = {"train": cifar_train.targets, "test": cifar_test.targets}
 
@@ -33,8 +34,10 @@ class SubCIFAR(VisionDataset):
       if targets[mode][i] in self.stored_labels:
         images.append(data[mode][i])
         labels.append(targets[mode][i])
+    # storing the data into a dataframe object    
     self.dataFrame = pd.DataFrame(zip(images, labels), columns=["image", "label"]) 
 
+  # add samples (exemplars) to the dataset from an outer source
   def add_samples(self, new_samples):
     new_dataframe = pd.DataFrame(new_samples, columns=["image", "label"])
     self.dataFrame = pd.concat([self.dataFrame, new_dataframe], ignore_index = True)
