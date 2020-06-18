@@ -14,13 +14,6 @@ def compute_sigmoid_cross_entropy_loss(input, target):
     loss = -torch.mean(loss, dim = 0, keepdim = False)
     return loss
 
-def compute_icarl_cross_entropy_loss(input, target):
-    input = torch.nn.LogSigmoid()(input)
-    target = torch.nn.Sigmoid()(target)
-    loss = torch.sum(input * target, dim = 1, keepdim = False)
-    loss = -torch.mean(loss, dim = 0, keepdim = False)
-    return loss
-
 def _compute_hinton_loss(input, target):
     T = 2
     input = torch.log_softmax(input/T, dim = 1)
@@ -37,6 +30,13 @@ def _compute_icarl_loss(input, target):
     crit = nn.BCEWithLogitsLoss(reduction = "mean")
     target = nn.Sigmoid()(target)
     return crit(input, target)
+
+def compute_icarl_cross_entropy_loss(input, target):
+    input = torch.nn.LogSigmoid()(input)
+    target = torch.nn.Sigmoid()(target)
+    loss = torch.sum(input * target, dim = 1, keepdim = False)
+    loss = -torch.mean(loss, dim = 0, keepdim = False)
+    return loss
 
 def _compute_kldiv_loss(input, target):
     crit = nn.KLDivLoss(reduction = "mean")
