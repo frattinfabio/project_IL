@@ -3,6 +3,7 @@ import torch
 import torch.nn.functional as F
 from torchvision import transforms
 
+# [FCClassifier] simply classifies according to the output of the network by choosing the most likable class
 class FCClassifier():
   def __init__(self):
       self.net = None
