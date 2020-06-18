@@ -3,17 +3,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 def _compute_cross_entropy_loss(input, target):
-    input = torch.nn.Sigmoid()(input)
+    input = torch.log_softmax(input, dim = 1)
     loss = torch.sum(input * target, dim = 1, keepdim = False)
     loss = -torch.mean(loss, dim = 0, keepdim = False)
     return loss
 
-def _compute_exp_cross_entropy_loss(input, target):
-    input = torch.log(torch.exp(input)/(1+torch.exp(input)))
-    loss = torch.sum(input * target, dim = 1, keepdim = False)
-    loss = -torch.mean(loss, dim = 0, keepdim = False)
-    return loss
-
+# distillation loss as described by Hinton et. al
 def _compute_hinton_loss(input, target):
     T = 2
     input = torch.log_softmax(input/T, dim = 1)
@@ -22,21 +17,16 @@ def _compute_hinton_loss(input, target):
     loss = -torch.mean(loss, dim = 0, keepdim = False)
     return T*T*loss
 
+# bce with hard target: classification loss in iCaRL
 def _compute_bce_loss(input, target):
     crit = nn.BCEWithLogitsLoss(reduction = "mean")
     return crit(input, target)
 
+# bce with soft targets: distillation loss as described in iCaRL
 def _compute_icarl_loss(input, target):
     crit = nn.BCEWithLogitsLoss(reduction = "mean")
     target = nn.Sigmoid()(target)
     return crit(input, target)
-
-def _compute_icarl_cross_entropy_loss(input, target):
-    input = torch.log(torch.exp(input)/(1+torch.exp(input)))
-    target = torch.exp(target)/(1+torch.exp(target))
-    loss = torch.sum(input * target, dim = 1, keepdim = False)
-    loss = -torch.mean(loss, dim = 0, keepdim = False)
-    return loss
 
 def _compute_kldiv_loss(input, target):
     crit = nn.KLDivLoss(reduction = "mean")
@@ -44,6 +34,9 @@ def _compute_kldiv_loss(input, target):
     target = torch.softmax(target, dim = 1)
     return crit(input, target)
 
+# loss described in the "Learning a Unified Classifier Incrementally via Rebalancing"
+# measures the cosine similarity of the previous and new features representation (normalized)
+# lfc = less forget constraint
 def _compute_lfc_loss(input, target):
     input = F.normalize(input, p = 2)
     target = F.normalize(target, p = 2)
@@ -51,14 +44,15 @@ def _compute_lfc_loss(input, target):
     loss = torch.mean(1 - cosine_similarity, dim = 0)
     return loss
 
+# the CustomizedLoss compute a loss made by 2 terms:
+# a [classification] term
+# a d
 class CustomizedLoss():
     def __init__(self, classification, distillation):
         self.classification = classification
         self.distillation = distillation
         self.loss_computer = {
         "bce": _compute_bce_loss,
-        "exp_ce": _compute_exp_cross_entropy_loss,
-        "icarl_ce": _compute_icarl_cross_entropy_loss,
         "icarl": _compute_icarl_loss,
         "ce": _compute_cross_entropy_loss,
         "hinton": _compute_hinton_loss,
@@ -78,6 +72,7 @@ class CustomizedLoss():
             n_new_classes = class_input.shape[1]
             n_old_classes = dist_input.shape[1]
             if self.distillation == "lfc":
+                # lfc requires its own class-dist ratio
                 class_ratio = 1
                 dist_ratio = 10 * ((n_new_classes/n_old_classes)**0.5)
             else:
