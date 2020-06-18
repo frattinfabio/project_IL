@@ -52,13 +52,14 @@ class IL2MClassifier():
             self.mean_train_scores[num_old_classes + i][1] /= num_images[num_old_classes + i]
 
     def rectify(self, score, num_old_classes):
+        lambda_rect = 1.3
         for i in range(num_old_classes):
             old_step = self.mean_train_scores[i][0]
             mu_p_class = self.mean_train_scores[i][1]
             mu_n_class = self.mean_examplars_scores[i]
             conf_p = self.confidences[old_step]
             conf_n = self.confidences[self.current_step]
-            score[i] = score[i] * (mu_p_class/mu_n_class) * (conf_n/conf_p)
+            score[i] = lambda_rect * score[i] * (mu_p_class/mu_n_class) * (conf_n/conf_p)
         return score
 
     def classify(self, images):
