@@ -4,6 +4,7 @@ from project_IL.classifiers.FCClassifier import FCClassifier
 from project_IL.classifiers.KNNClassifier import KNNClassifier
 from project_IL.classifiers.IL2MClassifier import IL2MClassifier
 
+# train parameters from the iCaRL paper
 train_params_base = {
 "LR": 2 ,
 "MOMENTUM": 0.9 ,
@@ -23,6 +24,15 @@ train_params_base = {
                                      transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
                                      ]),
 }
+
+
+# [approach_params_*] stores all the option according to the different approach (*) we want to pursue
+# "classification_loss" : the type of classification loss (see CustomizedLoss.py for the list of possible loss behaviour)
+# "distillation_loss" : the type of distillation loss
+# "classifier": the classifier used (see the project_IL/classifier repo)
+# "use_*": whether to use the specified technique (*) in the learning phase (boolean)
+# "n_exemplars": the total number of exemplars stored
+# "exemplars_selection": the policy to select the exemplars
 
 approach_params_finetuning = {
 "classification_loss": "bce",
