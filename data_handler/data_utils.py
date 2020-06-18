@@ -1,6 +1,9 @@
 from project_IL.data_handler.SubCIFAR import SubCIFAR
 from torch.utils.data import DataLoader
 
+# loading data at the current incremental [step] from the CIFAR dataset according to the [labels_split].
+# retrun the new training data, the new test data and the test data from the previous classes
+# to evaluate the new model on the old classes
 def load_data(step, labels_split, train_params, exemplars = None):
 
   new_labels = labels_split[step]
