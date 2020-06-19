@@ -118,7 +118,7 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
     def eta(self):
-        return self.linear.sigma.data
+        return self.fc.sigma.data
 
     def __init__(self, block, layers, num_classes = 10):
         self.inplanes = 16
