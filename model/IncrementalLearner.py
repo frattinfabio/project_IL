@@ -34,7 +34,7 @@ class IncrementalLearner():
         # If resnet with cosine layer is used
         else:
             self.net = cosine_layer_resnet32()
-            self.net.fc = CosineLayer(64, self.num_classes)
+            self.net.fc = CosineLayer(64, self.classes_per_group)
             
         self.init_weights = torch.nn.init.kaiming_normal_(self.net.fc.weight)
         parameters_to_optimize = self.net.parameters()
