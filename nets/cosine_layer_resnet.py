@@ -131,7 +131,7 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, 32, layers[1], stride=2)
         self.layer3 = self._make_layer(BasicBlockNoReLu, 64, layers[2], stride=2)
         self.avgpool = nn.AvgPool2d(8, stride=1)
-        self.fc = CosineLinear(64 * block.expansion, num_classes)
+        self.fc = CosineLayer(64 * block.expansion, num_classes)
         self.out_dim = 64 * block.expansion
 
         for m in self.modules():
@@ -193,9 +193,9 @@ class ResNet(nn.Module):
 
         return x
 
-class CosineLinear(nn.Module):
+class CosineLayer(nn.Module):
     def __init__(self, in_features, out_features, sigma=True):
-        super(CosineLinear, self).__init__()
+        super(CosineLayer, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
         self.weight = nn.Parameter(torch.Tensor(out_features, in_features))
