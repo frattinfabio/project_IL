@@ -41,6 +41,10 @@ def _compute_kldiv_loss(input, target):
     target = torch.softmax(target, dim = 1)
     return crit(input, target)
 
+def _compute_l2_loss(input, target):
+    crit = nn.MSELoss(reduction='mean')
+    return crit(input, target)
+
 # loss described in the "Learning a Unified Classifier Incrementally via Rebalancing"
 # measures the cosine similarity of the previous and new features representation (normalized)
 # lfc = less forget constraint
@@ -64,7 +68,8 @@ class CustomizedLoss():
         "icarl_ce": _compute_soft_cross_entropy_loss,
         "hinton": _compute_hinton_loss,
         "kldiv": _compute_kldiv_loss,
-        "lfc": _compute_lfc_loss
+        "lfc": _compute_lfc_loss,
+        "l2": _compute_l2_loss
         }
 
     def __call__(self, class_input, class_target, dist_input, dist_target):
