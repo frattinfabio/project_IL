@@ -168,9 +168,9 @@ class ResNet(nn.Module):
         x = self.layer3(x)
 
         x = self.avgpool(x)
-        feature = x.view(x.size(0), -1)
+        features = x.view(x.size(0), -1)
 
-        out =self.fc(feature)
+        out =self.fc(features)
 
         if output == 'features':
             return features
