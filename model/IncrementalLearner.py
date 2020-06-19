@@ -86,7 +86,7 @@ class IncrementalLearner():
                 self.net.fc = nn.Linear(self.net.fc.in_features, self.n_known_classes)
                 self.net.fc.weight.data = torch.cat((old_weights, self.init_weights))
             else:
-                prev_sigma = copy.deepcopy(self.net.linear.sigma)
+                prev_sigma = copy.deepcopy(self.net.fc.sigma)
                 self.net.fc = CosineLinear(64,self.n_known_classes)
                 self.net.fc.weight.data = torch.cat((old_weights, self.init_weights))
                 self.net.fc.sigma.data = prev_sigma
