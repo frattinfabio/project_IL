@@ -31,10 +31,12 @@ class IncrementalLearner():
         if cosine_layer == False:
             self.net = resnet32()
             self.net.fc = nn.Linear(self.net.fc.in_features, self.classes_per_group)
-            self.init_weights = torch.nn.init.kaiming_normal_(self.net.fc.weight)
+        # If resnet with cosine layer is used
         else:
             self.net = cosine_layer_resnet32()
-            self.net.fc = CosineLayer(64,n_classes)
+            self.net.fc = CosineLayer(64, self.num_classes)
+            
+        self.init_weights = torch.nn.init.kaiming_normal_(self.net.fc.weight)
         parameters_to_optimize = self.net.parameters()
         self.optimizer = optim.SGD(parameters_to_optimize , lr = train_params["LR"], momentum = train_params["MOMENTUM"], weight_decay = train_params["WEIGHT_DECAY"])
         self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer, milestones = train_params["STEP_MILESTONES"], gamma = train_params["GAMMA"])
@@ -78,8 +80,15 @@ class IncrementalLearner():
 
             # add new output nodes to the last layer of the [net]
             old_weights = self.net.fc.weight.data
-            self.net.fc = nn.Linear(self.net.fc.in_features, self.n_known_classes)
-            self.net.fc.weight.data = torch.cat((old_weights, self.init_weights))
+            
+            if cosine_layer == False:
+                self.net.fc = nn.Linear(self.net.fc.in_features, self.n_known_classes)
+                self.net.fc.weight.data = torch.cat((old_weights, self.init_weights))
+            else:
+                prev_sigma = copy.deepcopy(self.net.linear.sigma)
+                self.net.fc = CosineLinear(64,self.n_known_classes)
+                self.net.fc.weight.data = torch.cat((old_weights, self.init_weights)
+                self.net.fc.sigma.data = prev_sigma
             parameters_to_optimize = self.net.parameters()
             self.optimizer = optim.SGD(parameters_to_optimize , lr = self.train_params["LR"], momentum = self.train_params["MOMENTUM"], weight_decay = self.train_params["WEIGHT_DECAY"])
             self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer, milestones = self.train_params["STEP_MILESTONES"], gamma = self.train_params["GAMMA"])
