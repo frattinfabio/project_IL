@@ -128,7 +128,7 @@ class IncrementalLearner():
                     prev_output, prev_features = self.prev_net(images, output = 'all')
                     # "lfc" loss requires the previous and current features to compute the loss
                     if self.approach_params["distillation_loss"] == "lfc":
-                        dist_input = features[:, :-n_new_classes]
+                        dist_input = features
                         dist_target = prev_features
                     else:
                         dist_input = output[:, :-n_new_classes]
