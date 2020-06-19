@@ -13,10 +13,11 @@ from project_IL.data_handler.SubCIFAR import SubCIFAR
 from project_IL.data_handler.LabelsSplitter import LabelsSplitter
 from project_IL.model.CustomizedLoss import CustomizedLoss
 from project_IL.nets.resnet import resnet32
+from project_IL.nets.cosine_layer_resnet import CosineLayer
 
 class IncrementalLearner():
 
-    def __init__(self, num_classes, num_groups, splitter_seed, approach_params, train_params):
+    def __init__(self, num_classes, num_groups, splitter_seed, approach_params, train_params, cosine_layer = False):
         self.num_classes = num_classes
         self.num_groups = num_groups
         self.classes_per_group = num_classes//num_groups
@@ -27,9 +28,13 @@ class IncrementalLearner():
         self.splitter = LabelsSplitter(num_classes, num_groups, seed = splitter_seed)
         
         # [net] : the main net to be trained
-        self.net = resnet32()
-        self.net.fc = nn.Linear(self.net.fc.in_features, self.classes_per_group)
-        self.init_weights = torch.nn.init.kaiming_normal_(self.net.fc.weight)
+        if cosine_layer == False:
+            self.net = resnet32()
+            self.net.fc = nn.Linear(self.net.fc.in_features, self.classes_per_group)
+            self.init_weights = torch.nn.init.kaiming_normal_(self.net.fc.weight)
+        else:
+            self.net = resnet32_cosine(num_classes=10)
+            self.net.fc = CosineLinear(64,n_classes)
         parameters_to_optimize = self.net.parameters()
         self.optimizer = optim.SGD(parameters_to_optimize , lr = train_params["LR"], momentum = train_params["MOMENTUM"], weight_decay = train_params["WEIGHT_DECAY"])
         self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer, milestones = train_params["STEP_MILESTONES"], gamma = train_params["GAMMA"])
