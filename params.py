@@ -74,6 +74,17 @@ approach_params_variation = {
 "exemplars_selection" : "random"
 }
 
+approach_params_cosine_layer = {
+"classification_loss": "ce",
+"distillation_loss": "lfc",
+"classifier": FCCLassifier(),
+"use_distillation" : True,
+"use_variation" : True,
+"use_exemplars": True,
+"n_exemplars": 2000,
+"exemplars_selection" : "random"
+}
+
 def get_params(method):
     if method == "FINETUNING":
         return train_params_base, approach_params_finetuning
@@ -81,5 +92,10 @@ def get_params(method):
         return train_params_base, approach_params_lwf
     elif method == "ICARL":
         return train_params_base, approach_params_icarl
+    elif method == "COSINE":
+        modified_params = train_params_base.copy()
+        modified_params['LR'] = 0.1
+        modified_params['GAMMA'] = 0.1
+        return modified_params, approach_params_cosine_layer
     else:
         return train_params_base, approach_params_variation
