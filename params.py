@@ -79,7 +79,7 @@ approach_params_cosine_layer = {
 "distillation_loss": "lfc",
 "classifier": FCClassifier(),
 "use_distillation" : True,
-"use_variation" : True,
+"use_variation" : False,
 "use_exemplars": True,
 "n_exemplars": 2000,
 "exemplars_selection" : "random"
