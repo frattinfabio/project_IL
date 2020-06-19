@@ -24,6 +24,7 @@ class IncrementalLearner():
 
         self.train_params = train_params
         self.approach_params = approach_params
+        self.cosine_layer = cosine_layer
 
         self.splitter = LabelsSplitter(num_classes, num_groups, seed = splitter_seed)
         
@@ -81,7 +82,7 @@ class IncrementalLearner():
             # add new output nodes to the last layer of the [net]
             old_weights = self.net.fc.weight.data
             
-            if cosine_layer == False:
+            if self.cosine_layer == False:
                 self.net.fc = nn.Linear(self.net.fc.in_features, self.n_known_classes)
                 self.net.fc.weight.data = torch.cat((old_weights, self.init_weights))
             else:
