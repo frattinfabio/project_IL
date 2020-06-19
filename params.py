@@ -77,7 +77,7 @@ approach_params_variation = {
 approach_params_cosine_layer = {
 "classification_loss": "ce",
 "distillation_loss": "lfc",
-"classifier": FCCLassifier(),
+"classifier": FCClassifier(),
 "use_distillation" : True,
 "use_variation" : True,
 "use_exemplars": True,
