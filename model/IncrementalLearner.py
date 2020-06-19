@@ -87,7 +87,7 @@ class IncrementalLearner():
             else:
                 prev_sigma = copy.deepcopy(self.net.linear.sigma)
                 self.net.fc = CosineLinear(64,self.n_known_classes)
-                self.net.fc.weight.data = torch.cat((old_weights, self.init_weights)
+                self.net.fc.weight.data = torch.cat((old_weights, self.init_weights))
                 self.net.fc.sigma.data = prev_sigma
             parameters_to_optimize = self.net.parameters()
             self.optimizer = optim.SGD(parameters_to_optimize , lr = self.train_params["LR"], momentum = self.train_params["MOMENTUM"], weight_decay = self.train_params["WEIGHT_DECAY"])
