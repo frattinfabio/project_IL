@@ -13,7 +13,7 @@ from project_IL.data_handler.SubCIFAR import SubCIFAR
 from project_IL.data_handler.LabelsSplitter import LabelsSplitter
 from project_IL.model.CustomizedLoss import CustomizedLoss
 from project_IL.nets.resnet import resnet32
-from project_IL.nets.cosine_layer_resnet import CosineLayer, resnet32 as cosine_layer_resnet32
+from project_IL.nets.cosine_layer_resnet import CosineLayer, resnet32 as cosine_resnet32
 
 class IncrementalLearner():
 
@@ -34,7 +34,7 @@ class IncrementalLearner():
             self.net.fc = nn.Linear(self.net.fc.in_features, self.classes_per_group)
         # If resnet with cosine layer is used
         else:
-            self.net = cosine_layer_resnet32()
+            self.net = cosine_resnet32()
             self.net.fc = CosineLayer(self.net.fc.in_features, self.classes_per_group)
             
         self.init_weights = torch.nn.init.kaiming_normal_(self.net.fc.weight)
@@ -134,17 +134,17 @@ class IncrementalLearner():
 
                 if self.use_distillation and self.current_step > 0:
                     # if distillation is used, change input and target of classfication to new classes only
-                    class_input = class_input[:, -n_new_classes:]
-                    # the variation requires the classification targets to be the output of the ft_net
-                    if self.use_variation:
-                        ft_output = self.ft_net(images)
-                        class_target = ft_output[:, -n_new_classes:]
-                    else:
-                        class_target = class_target[:, -n_new_classes:]
-                  
+                    if not self.cosine_layer:
+                      class_input = class_input[:, -n_new_classes:]
+                      # the variation requires the classification targets to be the output of the ft_net
+                      if self.use_variation:
+                          ft_output = self.ft_net(images)
+                          class_target = ft_output[:, -n_new_classes:]
+                      else:
+                          class_target = class_target[:, -n_new_classes:]
+
                     prev_output, prev_features = self.prev_net(images, output = 'all')
-                    # "lfc" loss requires the previous and current features to compute the loss
-                    if self.approach_params["distillation_loss"] == "lfc":
+                    if self.cosine_layer:
                         dist_input = features
                         dist_target = prev_features
                     else:
