@@ -83,7 +83,7 @@ class CustomizedLoss():
         if self.distillation is not None and dist_input is not None and dist_target is not None:
             if self.distillation == "lfc":
                 # lfc requires its own class-dist ratio
-                lambda_dist = 0.1 * ((n_new_classes/n_old_classes)**0.5)
+                lambda_dist = 0.1
                 dist_ratio =  lambda_dist * (1 - class_ratio)
             else:
                 dist_ratio = 1 - class_ratio
