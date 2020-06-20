@@ -51,8 +51,8 @@ def _compute_l2_loss(input, target):
 def _compute_lfc_loss(input, target):
     input = F.normalize(input, p = 2)
     target = F.normalize(target, p = 2)
-    cosine_similarity = torch.sum(input * target, dim = 1)
-    loss = torch.mean(1 - cosine_similarity, dim = 0)
+    crit = nn.CosineEmbeddingLoss()
+    loss = crit(input, target, torch.ones(input.shape[0],).cuda())
     return loss
 
 # the CustomizedLoss compute a loss made by 2 terms:
@@ -83,8 +83,8 @@ class CustomizedLoss():
         if self.distillation is not None and dist_input is not None and dist_target is not None:
             if self.distillation == "lfc":
                 # lfc requires its own class-dist ratio
-                lambda_dist = 0.1
-                dist_ratio =  lambda_dist * (1 - class_ratio)
+                dist_ratio =  5 * math.sqrt(class_ratio/(1-class_ratio))
+                class_ratio = 1
             else:
                 dist_ratio = 1 - class_ratio
 
