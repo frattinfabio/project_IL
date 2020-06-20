@@ -72,7 +72,7 @@ class CustomizedLoss():
         "l2": _compute_l2_loss
         }
 
-    def __call__(self, class_input, class_target, dist_input, dist_target):
+    def __call__(self, class_input, class_target, dist_input, dist_target, class_ratio):
         # need this to handle the variation case, when normally the class_loss is "icarl"
         # but in the first step is "bce"
         if self.classification == "icarl" and dist_input is None:
@@ -81,14 +81,11 @@ class CustomizedLoss():
             class_loss = self.loss_computer[self.classification](class_input, class_target)
 
         if self.distillation is not None and dist_input is not None and dist_target is not None:
-            n_new_classes = class_input.shape[1]
-            n_old_classes = dist_input.shape[1]
             if self.distillation == "lfc":
                 # lfc requires its own class-dist ratio
-                class_ratio = 1
-                dist_ratio = 10 * ((n_new_classes/n_old_classes)**0.5)
+                lambda_dist = 0.1 * ((n_new_classes/n_old_classes)**0.5)
+                dist_ratio =  lambda_dist * (1 - class_ratio)
             else:
-                class_ratio = n_new_classes/(n_new_classes+n_old_classes)
                 dist_ratio = 1 - class_ratio
 
             dist_loss =  self.loss_computer[self.distillation](dist_input, dist_target)
