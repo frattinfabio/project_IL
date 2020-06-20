@@ -1,8 +1,6 @@
 from torchvision import transforms
 from project_IL.classifiers.NMEClassifier import NMEClassifier
 from project_IL.classifiers.FCClassifier import FCClassifier
-from project_IL.classifiers.KNNClassifier import KNNClassifier
-from project_IL.classifiers.IL2MClassifier import IL2MClassifier
 
 # train parameters from the iCaRL paper
 train_params_base = {
@@ -23,6 +21,26 @@ train_params_base = {
                                      transforms.ToTensor(),
                                      transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
                                      ]),
+}
+
+train_params_cosine = {
+  "LR": 0.1,
+  "MOMENTUM": 0.9 ,
+  "WEIGHT_DECAY": 5e-4,
+  "STEP_MILESTONES": [80,120],
+  "GAMMA": 0.1,
+  "NUM_EPOCHS": 160,
+  "BATCH_SIZE": 128,
+  "train_transform": transforms.Compose([
+                                        transforms.RandomCrop(32, padding = 4),
+                                        transforms.RandomHorizontalFlip(),
+                                        transforms.ToTensor(),
+                                        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+                                        ]),
+  "test_transform": transforms.Compose([
+                                      transforms.ToTensor(),
+                                      transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+                                      ]),
 }
 
 
@@ -74,7 +92,7 @@ approach_params_variation = {
 "exemplars_selection" : "random"
 }
 
-approach_params_cosine_layer = {
+approach_params_cosine = {
 "classification_loss": "ce",
 "distillation_loss": "lfc",
 "classifier": FCClassifier(),
@@ -93,9 +111,6 @@ def get_params(method):
     elif method == "ICARL":
         return train_params_base, approach_params_icarl
     elif method == "COSINE":
-        modified_params = train_params_base.copy()
-        modified_params['LR'] = 0.1
-        modified_params['GAMMA'] = 0.1
-        return modified_params, approach_params_cosine_layer
+        return train_params_cosine, approach_params_cosine
     else:
         return train_params_base, approach_params_variation
