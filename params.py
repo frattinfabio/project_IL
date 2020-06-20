@@ -59,6 +59,7 @@ approach_params_finetuning = {
 "use_distillation" : False,
 "use_variation" : False,
 "use_exemplars": False,
+"use_cosine": False,
 }
 
 approach_params_lwf = {
@@ -68,6 +69,7 @@ approach_params_lwf = {
 "use_distillation" : False,
 "use_variation" : False,
 "use_exemplars": False,
+"use_cosine": False,
 }
 
 approach_params_icarl = {
@@ -77,6 +79,7 @@ approach_params_icarl = {
 "use_distillation" : True,
 "use_variation" : False,
 "use_exemplars": True,
+"use_cosine": False,
 "n_exemplars": 2000,
 "exemplars_selection" : "random"
 }
@@ -88,6 +91,7 @@ approach_params_variation = {
 "use_distillation" : True,
 "use_variation" : True,
 "use_exemplars": True,
+"use_cosine": False,
 "n_exemplars": 2000,
 "exemplars_selection" : "random"
 }
@@ -99,6 +103,7 @@ approach_params_cosine = {
 "use_distillation" : True,
 "use_variation" : False,
 "use_exemplars": True,
+"use_cosine": True,
 "n_exemplars": 2000,
 "exemplars_selection" : "random"
 }
