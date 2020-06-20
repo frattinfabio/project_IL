@@ -29,13 +29,13 @@ class IncrementalLearner():
         self.splitter = LabelsSplitter(num_classes, num_groups, seed = splitter_seed)
         
         # [net] : the main net to be trained
-        if cosine_layer == False:
+        if not cosine_layer:
             self.net = resnet32()
             self.net.fc = nn.Linear(self.net.fc.in_features, self.classes_per_group)
         # If resnet with cosine layer is used
         else:
             self.net = cosine_layer_resnet32()
-            self.net.fc = CosineLayer(64, self.classes_per_group)
+            self.net.fc = CosineLayer(self.net.fc.in_features, self.classes_per_group)
             
         self.init_weights = torch.nn.init.kaiming_normal_(self.net.fc.weight)
         parameters_to_optimize = self.net.parameters()
@@ -81,15 +81,15 @@ class IncrementalLearner():
 
             # add new output nodes to the last layer of the [net]
             old_weights = self.net.fc.weight.data
-            
-            if self.cosine_layer == False:
+            if not self.cosine_layer:
                 self.net.fc = nn.Linear(self.net.fc.in_features, self.n_known_classes)
                 self.net.fc.weight.data = torch.cat((old_weights, self.init_weights))
             else:
                 prev_sigma = copy.deepcopy(self.net.fc.sigma)
-                self.net.fc = CosineLayer(64,self.n_known_classes)
+                self.net.fc = CosineLayer(self.net.fc.in_features,self.n_known_classes)
                 self.net.fc.weight.data = torch.cat((old_weights, self.init_weights))
                 self.net.fc.sigma.data = prev_sigma
+               
             parameters_to_optimize = self.net.parameters()
             self.optimizer = optim.SGD(parameters_to_optimize , lr = self.train_params["LR"], momentum = self.train_params["MOMENTUM"], weight_decay = self.train_params["WEIGHT_DECAY"])
             self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer, milestones = self.train_params["STEP_MILESTONES"], gamma = self.train_params["GAMMA"])
@@ -104,8 +104,10 @@ class IncrementalLearner():
     # train the main [net] according to the [train_params] and [approach_params]
     def train(self, dataloader):
         print("Training the main net...")
+        
         n_new_classes = self.classes_per_group
-
+        class_ratio = n_new_classes/self.n_known_classes
+        
         self.net = self.net.cuda()
         self.net.train(True)
         if self.current_step > 0:
@@ -153,7 +155,7 @@ class IncrementalLearner():
 
                 self.optimizer.zero_grad()
                 
-                loss = self.loss_criterion(class_input, class_target, dist_input, dist_target)
+                loss = self.loss_criterion(class_input, class_target, dist_input, dist_target, class_ratio)
                 loss.backward()
                 self.optimizer.step()
                 log_step = log_step + 1
