@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import math
 
 def _compute_cross_entropy_loss(input, target):
     input = torch.log_softmax(input, dim = 1)
