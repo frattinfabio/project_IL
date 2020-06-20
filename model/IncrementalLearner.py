@@ -13,7 +13,7 @@ from project_IL.data_handler.SubCIFAR import SubCIFAR
 from project_IL.data_handler.LabelsSplitter import LabelsSplitter
 from project_IL.model.CustomizedLoss import CustomizedLoss
 from project_IL.nets.resnet import resnet32
-from project_IL.nets.cosine_layer_resnet import CosineLayer, resnet32 as cosine_resnet32
+from project_IL.nets.cosine_resnet import CosineLayer, resnet32 as cosine_resnet32
 
 class IncrementalLearner():
 
