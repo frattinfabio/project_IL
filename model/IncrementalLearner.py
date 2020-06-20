@@ -17,25 +17,25 @@ from project_IL.nets.cosine_resnet import CosineLayer, resnet32 as cosine_resnet
 
 class IncrementalLearner():
 
-    def __init__(self, num_classes, num_groups, splitter_seed, approach_params, train_params, cosine_layer = False):
+    def __init__(self, num_classes, num_groups, splitter_seed, approach_params, train_params):
         self.num_classes = num_classes
         self.num_groups = num_groups
         self.classes_per_group = num_classes//num_groups
 
         self.train_params = train_params
         self.approach_params = approach_params
-        self.cosine_layer = cosine_layer
+        self.use_cosine = approach_params["use_cosine"]
 
         self.splitter = LabelsSplitter(num_classes, num_groups, seed = splitter_seed)
         
         # [net] : the main net to be trained
-        if not cosine_layer:
-            self.net = resnet32()
-            self.net.fc = nn.Linear(self.net.fc.in_features, self.classes_per_group)
-        # If resnet with cosine layer is used
-        else:
+        if self.use_cosine:
             self.net = cosine_resnet32()
             self.net.fc = CosineLayer(self.net.fc.in_features, self.classes_per_group)
+        # If resnet with cosine layer is used
+        else:
+            self.net = resnet32()
+            self.net.fc = nn.Linear(self.net.fc.in_features, self.classes_per_group)
             
         self.init_weights = torch.nn.init.kaiming_normal_(self.net.fc.weight)
         parameters_to_optimize = self.net.parameters()
@@ -81,7 +81,7 @@ class IncrementalLearner():
 
             # add new output nodes to the last layer of the [net]
             old_weights = self.net.fc.weight.data
-            if not self.cosine_layer:
+            if not self.use_cosine:
                 self.net.fc = nn.Linear(self.net.fc.in_features, self.n_known_classes)
                 self.net.fc.weight.data = torch.cat((old_weights, self.init_weights))
             else:
@@ -134,7 +134,7 @@ class IncrementalLearner():
 
                 if self.use_distillation and self.current_step > 0:
                     # if distillation is used, change input and target of classfication to new classes only
-                    if not self.cosine_layer:
+                    if not self.use_cosine:
                       class_input = class_input[:, -n_new_classes:]
                       # the variation requires the classification targets to be the output of the ft_net
                       if self.use_variation:
@@ -144,7 +144,7 @@ class IncrementalLearner():
                           class_target = class_target[:, -n_new_classes:]
 
                     prev_output, prev_features = self.prev_net(images, output = 'all')
-                    if self.cosine_layer:
+                    if self.use_cosine:
                         dist_input = features
                         dist_target = prev_features
                     else:
