@@ -246,7 +246,7 @@ class IncrementalLearner():
                     labels = transform_labels_onehot(labels, self.n_known_classes).cuda()
                     output = self.ft_net(images)
                     self.ft_optimizer.zero_grad()
-                    loss = self.ft_loss_criterion(output, labels, None, None)
+                    loss = self.ft_loss_criterion(output, labels, None, None, class_ratio = 1)
                     loss.backward()
                     self.ft_optimizer.step()
                     log_step = log_step + 1
