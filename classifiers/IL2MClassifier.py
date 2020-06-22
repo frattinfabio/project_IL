@@ -54,7 +54,7 @@ class IL2MClassifier():
 
     def rectify(self, score, num_old_classes):
         # the lambda rect was found through a tuning phase
-        lambda_rect = 1.8
+        lambda_rect = 1.3
         for i in range(num_old_classes):
             old_step = self.mean_train_scores[i][0]
             mu_p_class = self.mean_train_scores[i][1]
