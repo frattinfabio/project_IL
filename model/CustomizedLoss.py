@@ -43,6 +43,8 @@ def _compute_kldiv_loss(input, target):
     return crit(input, target)
 
 def _compute_l2_loss(input, target):
+    input = nn.Sigmoid()(input)
+    target = nn.Sigmoid()(target)
     crit = nn.MSELoss(reduction='mean')
     return crit(input, target)
 
