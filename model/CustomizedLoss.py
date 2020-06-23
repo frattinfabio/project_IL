@@ -48,6 +48,11 @@ def _compute_l2_loss(input, target):
     crit = nn.MSELoss(reduction='mean')
     return crit(input, target)
 
+def _compute_l2_hard_loss(input, target):
+    input = nn.Sigmoid()(input)
+    crit = nn.MSELoss(reduction='mean')
+    return crit(input, target)
+
 # loss described in the "Learning a Unified Classifier Incrementally via Rebalancing"
 # measures the cosine similarity of the previous and new features representation (normalized)
 # lfc = less forget constraint
@@ -73,6 +78,7 @@ class CustomizedLoss():
         "kldiv": _compute_kldiv_loss,
         "lfc": _compute_lfc_loss,
         "l2": _compute_l2_loss
+        "l2_hard": _compute_l2_hard_loss,   
         }
 
     def __call__(self, class_input, class_target, dist_input, dist_target, class_ratio):
