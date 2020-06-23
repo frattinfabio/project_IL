@@ -77,7 +77,7 @@ class CustomizedLoss():
         "hinton": _compute_hinton_loss,
         "kldiv": _compute_kldiv_loss,
         "lfc": _compute_lfc_loss,
-        "l2": _compute_l2_loss
+        "l2": _compute_l2_loss,
         "l2_hard": _compute_l2_hard_loss,   
         }
 
