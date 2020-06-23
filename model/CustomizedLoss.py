@@ -43,8 +43,6 @@ def _compute_kldiv_loss(input, target):
     return crit(input, target)
 
 def _compute_l2_loss(input, target):
-    input = torch.softmax(input, dim = 1)
-    target = torch.softmax(target, dim = 1)
     crit = nn.MSELoss(reduction='mean')
     return crit(input, target)
 
