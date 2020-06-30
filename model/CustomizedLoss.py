@@ -36,18 +36,21 @@ def _compute_soft_bce_loss(input, target):
     target = nn.Sigmoid()(target)
     return crit(input, target)
 
+# Kullback-Leibler divergence loss used as distillation loss in the variations of the losses
 def _compute_kldiv_loss(input, target):
     crit = nn.KLDivLoss(reduction = "mean")
     input = torch.log_softmax(input, dim = 1)
     target = torch.softmax(target, dim = 1)
     return crit(input, target)
 
+# MSE loss for distillation used in the variations of the losses
 def _compute_l2_loss(input, target):
     input = nn.Sigmoid()(input)
     target = nn.Sigmoid()(target)
     crit = nn.MSELoss(reduction='mean')
     return crit(input, target)
 
+# MSE loss for classification used in the variations of the losses
 def _compute_l2_hard_loss(input, target):
     input = nn.Sigmoid()(input)
     crit = nn.MSELoss(reduction='mean')
